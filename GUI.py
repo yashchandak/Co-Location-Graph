@@ -5,11 +5,13 @@
 # Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
+
+from __future__ import print_function
 import numpy
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QGraphicsScene, QFileDialog, QPixmap
-import YOLO_tiny_tf
+
 
 #import cv2
 
@@ -31,6 +33,9 @@ except AttributeError:
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
+        
+        self.flag = True
+        
         Dialog.setObjectName(_fromUtf8("Dialog"))
         Dialog.resize(737, 483)
         
@@ -125,9 +130,11 @@ class Ui_Dialog(object):
         self.graphicsView = QtGui.QGraphicsView(Dialog)
         self.graphicsView.setGeometry(QtCore.QRect(180, 80, 231, 161))
         self.graphicsView.setObjectName(_fromUtf8("graphicsView"))
+        self.scene2 = QGraphicsScene()
         self.graphicsView_2 = QtGui.QGraphicsView(Dialog)
         self.graphicsView_2.setGeometry(QtCore.QRect(430, 80, 281, 351))
         self.graphicsView_2.setObjectName(_fromUtf8("graphicsView_2"))
+        self.scene3 = QGraphicsScene()
         self.graphicsView_3 = QtGui.QGraphicsView(Dialog)
         self.graphicsView_3.setGeometry(QtCore.QRect(180, 270, 231, 171))
         self.graphicsView_3.setObjectName(_fromUtf8("graphicsView_3"))
@@ -159,9 +166,12 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
 
-    def selectFile(self):            
+    def selectFile(self): 
+                 
         self.scene.clear()
-        filename = '/home/yash/fish.jpg'#QFileDialog.getOpenFileName()
+        self.scene2.clear()
+        
+        filename = QFileDialog.getOpenFileName()
         self.lineEdit.setText(filename)
         
         self.scene.addPixmap(QPixmap(filename).scaled(self.graphicsView.size(), QtCore.Qt.KeepAspectRatio))
@@ -169,6 +179,24 @@ class Ui_Dialog(object):
         #myScaledPixmap = myPixmap.scaled(self.graphicsView.size(), Qt.KeepAspectRatio)
         print("here")   
         self.graphicsView.setScene(self.scene)
+        
+        #importing TensorFlow on top causes segmentation fault (official bug)
+        #importing here helps in working around the problem
+        import Yolo_module as detector
+        
+        if(self.flag):
+            self.detect = detector.YOLO_TF()
+            self.flag = False
+        
+        self.detect.detect_from_file(filename)
+        image = self.detect.tagged_image
+        image = QtGui.QImage(image, image.shape[1],\
+                            image.shape[0], image.shape[1] * 3,QtGui.QImage.Format_RGB888)
+        #pix = QtGui.QPixmap(image)
+        
+        self.scene2.addPixmap(QPixmap(image).scaled(self.graphicsView_3.size(), QtCore.Qt.KeepAspectRatio))
+        self.graphicsView_3.setScene(self.scene2)
+        
     
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(_translate("Dialog", "Dialog", None))

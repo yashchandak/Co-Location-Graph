@@ -1,8 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jun  9 19:35:09 2016
+
+@author: yash
+"""
+
 """
 Yolo Detector implementation in TensorFlow
 """
 
-from __future__ import print_function
 import numpy as np
 
 """  **Official bug**: Import opencv before tensorflow """
@@ -34,12 +40,14 @@ class YOLO_TF:
     h_img = 480
 
     def __init__(self,argvs = []):
-         cv2.namedWindow('YOLO_tiny detection',2)
-         tf.reset_default_graph() #reset graph variables from the canvas (useful for multiple time execution in same python shell), tf.close() doesn't remove graph variables from canvas.
-         self.argv_parser(argvs)         
-         self.build_networks()
-         self.detect_from_file(self.fromfile)
-         self.sess.close() #clean up session otherwise spyder can't execute the code again in same console
+        #print (argvs)       
+        
+        cv2.namedWindow('YOLO_tiny detection',2)
+        tf.reset_default_graph() #reset graph variables from the canvas (useful for multiple time execution in same python shell), tf.close() doesn't remove graph variables from canvas.
+        self.argv_parser(argvs)         
+        self.build_networks()
+        #self.detect_from_file(self.fromfile)
+        #self.sess.close() #clean up session otherwise spyder can't execute the code again in same console
          
     def __exit__(self):
         self.sess.close()
@@ -234,6 +242,9 @@ class YOLO_TF:
         if self.filewrite_txt : 
             if self.disp_console : print('    txt file writed : ' + self.tofile_txt)
             ftxt.close()
+         
+        self.tagged_image = img_cp
+        cv2.cvtColor(img_cp, cv2.COLOR_BGR2RGB, self.tagged_image)
 
     def iou(self,box1,box2):
         tb = min(box1[0]+0.5*box1[2],box2[0]+0.5*box2[2])-max(box1[0]-0.5*box1[2],box2[0]-0.5*box2[2])
@@ -246,5 +257,4 @@ class YOLO_TF:
         return None
 
     
-    def mark(filename):
-        return None
+   
