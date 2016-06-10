@@ -7,13 +7,14 @@ Created on Thu Jun  9 20:24:34 2016
 TODO
 1)Self-loops
 2)Approximate Distance metric
+3)Better visualisation
 """
 
 import networkx as nx
 #import matplotlib.pyplot as plt
 
 abs_ratio   = {}
-size_factor = 5000
+size_factor = 100
 
 
 def co_location(objects, axf):
@@ -25,20 +26,21 @@ def co_location(objects, axf):
     
     for i in range(len(objects)):
         labels[i] = objects[i][0]
-        node_sizes.append(int(size_factor * objects[i][5]))
+        node_sizes.append( int(size_factor * objects[i][5])**2 )
         for j in range(i+1  ,len(objects)):
             edges.append((i,j))
             weights.append(apx_distance(objects[i], objects[j]))
             
-    print(labels)  
-    print(nodes)
+    #print(labels)  
+    #print(nodes)
     G = nx.Graph()  
     G.add_nodes_from(nodes)
     G.add_edges_from(edges)
-    pos = nx.circular_layout(G)
+    pos = nx.spring_layout(G)
     nx.draw(G, pos, width=weights, node_size=node_sizes, labels=labels, with_labels=True, ax=axf)
     #plt.show()
-    
+ 
+   
 def apx_distance(x,y):
     #TODO implement distance metric    
     return 2

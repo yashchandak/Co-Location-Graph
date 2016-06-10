@@ -6,7 +6,12 @@ Created on Fri Jun 10 15:47:06 2016
 
 TODO
 1) Use super for setupUi
-2)
+2) Batch Process feature
+3) Utilise radio boxes
+
+Helpful references:
+1) For integrating matplotlib with PyQt4 (http://blog.rcnelson.com/building-a-matplotlib-gui-with-qt-designer-part-1/)
+
 """
 from __future__ import print_function
 
@@ -15,38 +20,41 @@ from PyQt4.uic import loadUiType
 from PyQt4.QtGui import QGraphicsScene, QFileDialog, QPixmap
 
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import (
-    FigureCanvasQTAgg as FigureCanvas,
-    NavigationToolbar2QT as NavigationToolbar)
-    
-import numpy as np
-    
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+
 Ui_MainWindow, QMainWindow = loadUiType('GUI.ui')
 
 
 class Main(QMainWindow, Ui_MainWindow):
+    flag = True
+    categories = {}
+    
     def __init__(self, ):
         super(Main, self).__init__()
         self.setupUi(self)
         self.setupUi_custom()
 
-    def setupUi_custom(self,):
-        self.flag = True
+    def update_categories(self):
+        #update selected categories
+        for radiobox in self.findChildren(QtGui.QRadioButton):
+            self.categories[radiobox.text()] = radiobox.isChecked()
+        
+    def setupUi_custom(self,): 
+        self.update_categories()    
         self.scene = QGraphicsScene()
         self.scene2 = QGraphicsScene()
-        self.scene3 = QGraphicsScene()
         self.pushButton.clicked.connect(self.selectFile)
         
+        #Add blank canvas initially
         fig1 = Figure()            
-        ax1f1 = fig1.add_subplot(111)
-        ax1f1.plot(np.random.rand(5))
         self.addmpl(fig1)
 
-    def selectFile(self):                  
+    def selectFile(self):  
+        #Clear previous image displays        
         self.scene.clear()
         self.scene2.clear()
-        self.scene3.clear()
-        
+        self.update_categories()
+                
         filename = QFileDialog.getOpenFileName()
         self.lineEdit.setText(filename)
         
@@ -63,19 +71,19 @@ class Main(QMainWindow, Ui_MainWindow):
         if(self.flag):
             #initialise the model, only once
             self.classifier = yolo.YOLO_TF()
-            self.flag = False
-            
+            self.flag = False            
 
         self.rmmpl()                                    #remove previous graph
+        self.classifier.categories = self.categories
         self.classifier.detect_from_file(filename)      #execute Yolo on the image     
         
         #Dislplay tagged image        
         image = self.classifier.tagged_image        
-        image = QtGui.QImage(image, image.shape[1],\
-                            image.shape[0], image.shape[1] * 3,QtGui.QImage.Format_RGB888)        
+        image = QtGui.QImage(image, image.shape[1], image.shape[0], image.shape[1] * 3,QtGui.QImage.Format_RGB888)        
         self.scene2.addPixmap(QPixmap(image).scaled(self.graphicsView_3.size(), QtCore.Qt.KeepAspectRatio))
         self.graphicsView_3.setScene(self.scene2)        
         
+        #Display graph
         fig = Figure()
         axf = fig.add_subplot(111)
         gm.co_location(self.classifier.objects, axf)

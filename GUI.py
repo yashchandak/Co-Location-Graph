@@ -169,7 +169,7 @@ class Ui_MainWindow(object):
         self.radioButton_14.setText(_translate("MainWindow", "Bird", None))
         self.radioButton_9.setText(_translate("MainWindow", "Potted plant", None))
         self.label.setText(_translate("MainWindow", "Uplaoded Image", None))
-        self.radioButton_10.setText(_translate("MainWindow", "sheep", None))
+        self.radioButton_10.setText(_translate("MainWindow", "Sheep", None))
         self.label_4.setText(_translate("MainWindow", "Image", None))
         self.radioButton_2.setText(_translate("MainWindow", "Aeroplane", None))
         self.label_3.setText(_translate("MainWindow", "Co-Location Graph", None))

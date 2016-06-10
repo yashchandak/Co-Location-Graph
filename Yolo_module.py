@@ -3,10 +3,12 @@
 Created on Thu Jun  9 19:35:09 2016
 
 @author: yash
-"""
 
-"""
 Yolo Detector implementation in TensorFlow
+
+Helpful references:
+1) For Import and segmentation fault with tensorflow (https://github.com/tensorflow/tensorflow/issues/2034)
+
 """
 
 import numpy as np
@@ -19,7 +21,6 @@ import time
 import sys
 
 class YOLO_TF:
-    fromfile = '/home/yash/test3.jpg'#  '/home/yash/Project/Yolo/test/person.jpg' ##None
     img = None
     tofile_img = 'test/output.jpg'
     tofile_txt = 'test/output.txt'
@@ -34,20 +35,15 @@ class YOLO_TF:
     num_class = 20
     num_box = 2
     grid_size = 7
-    classes =  ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train","tvmonitor"]
-
+    classes =  ["Aeroplane", "Bicycle", "Bird", "Boat", "Bottle", "Bus", "Car", "Cat", "Chair", "Cow", "Dining Table", "Dog", "Horse", "Motorbike", "Person", "Potted plant", "Sheep", "Sofa", "Train","Tv"]
+    categories = {}
     w_img = 640
     h_img = 480
 
-    def __init__(self,argvs = []):
-        #print (argvs)       
-        
-        cv2.namedWindow('YOLO_tiny detection',2)
+    def __init__(self,argvs = []):    
         tf.reset_default_graph() #reset graph variables from the canvas (useful for multiple time execution in same python shell), tf.close() doesn't remove graph variables from canvas.
         self.argv_parser(argvs)         
         self.build_networks()
-        #self.detect_from_file(self.fromfile)
-        #self.sess.close() #clean up session otherwise spyder can't execute the code again in same console
          
     def __exit__(self):
         self.sess.close()
@@ -103,11 +99,13 @@ class YOLO_TF:
 
         conv = tf.nn.conv2d(inputs_pad, weight, strides=[1, stride, stride, 1], padding='VALID',name=str(idx)+'_conv')    
         conv_biased = tf.add(conv,biases,name=str(idx)+'_conv_biased')    
-        if self.disp_console : print ("   Layer  %d : Type = Conv, Size = %d * %d, Stride = %d, Filters = %d, Input channels = %d" %(idx,size,size,stride,filters,int(channels)) )
+        if self.disp_console : 
+            print ("   Layer  %d : Type = Conv, Size = %d * %d, Stride = %d, Filters = %d, Input channels = %d" %(idx,size,size,stride,filters,int(channels)) )
         return tf.maximum(self.alpha*conv_biased,conv_biased,name=str(idx)+'_leaky_relu')
 
     def pooling_layer(self,idx,inputs,size,stride):
-        if self.disp_console : print ('    Layer  %d : Type = Pool, Size = %d * %d, Stride = %d' % (idx,size,size,stride))
+        if self.disp_console :
+            print ('    Layer  %d : Type = Pool, Size = %d * %d, Stride = %d' % (idx,size,size,stride))
         return tf.nn.max_pool(inputs, ksize=[1, size, size, 1],strides=[1, stride, stride, 1], padding='SAME',name=str(idx)+'_pool')
 
     def fc_layer(self,idx,inputs,hiddens,flat = False,linear = False):
@@ -119,10 +117,15 @@ class YOLO_TF:
         else:
             dim = input_shape[1]
             inputs_processed = inputs
+        
         weight = tf.Variable(tf.truncated_normal([dim,hiddens], stddev=0.1))
         biases = tf.Variable(tf.constant(0.1, shape=[hiddens]))    
-        if self.disp_console : print ('    Layer  %d : Type = Full, Hidden = %d, Input dimension = %d, Flat = %d, Activation = %d' % (idx,hiddens,int(dim),int(flat),1-int(linear)))
-        if linear : return tf.add(tf.matmul(inputs_processed,weight),biases,name=str(idx)+'_fc')
+        
+        if self.disp_console : 
+            print ('    Layer  %d : Type = Full, Hidden = %d, Input dimension = %d, Flat = %d, Activation = %d' % (idx,hiddens,int(dim),int(flat),1-int(linear)))
+        if linear : 
+            return tf.add(tf.matmul(inputs_processed,weight),biases,name=str(idx)+'_fc')
+        
         ip = tf.add(tf.matmul(inputs_processed,weight),biases)
         return tf.maximum(self.alpha*ip,ip,name=str(idx)+'_fc')
 
@@ -142,7 +145,8 @@ class YOLO_TF:
         self.result = self.interpret_output(net_output[0])
         self.show_results(img,self.result)
         strtime = str(time.time()-s)
-        if self.disp_console : print('Elapsed time : ' + strtime + ' secs' + '\n')
+        if self.disp_console : 
+            print('Elapsed time : ' + strtime + ' secs' + '\n')
 
     def detect_from_file(self,filename):
          if self.disp_console : 
@@ -213,7 +217,8 @@ class YOLO_TF:
 
         result = []
         for i in range(len(boxes_filtered)):
-            result.append([self.classes[classes_num_filtered[i]],boxes_filtered[i][0],boxes_filtered[i][1],boxes_filtered[i][2],boxes_filtered[i][3],probs_filtered[i]])
+            if (self.categories[self.classes[classes_num_filtered[i]]] or self.categories['All']):
+                result.append([self.classes[classes_num_filtered[i]],boxes_filtered[i][0],boxes_filtered[i][1],boxes_filtered[i][2],boxes_filtered[i][3],probs_filtered[i]])
 
         return result
 
@@ -222,6 +227,7 @@ class YOLO_TF:
         img_cp = img.copy()
         if self.filewrite_txt :
             ftxt = open(self.tofile_txt,'w')
+        
         for i in range(len(results)):
             
             x = int(results[i][1])
@@ -230,20 +236,23 @@ class YOLO_TF:
             h = int(results[i][4])//2
             if self.disp_console : 
                 print ('    class : ' + results[i][0] + ' , [x,y,w,h]=[' + str(x) + ',' + str(y) + ',' + str(int(results[i][3])) + ',' + str(int(results[i][4]))+'], Confidence = ' + str(results[i][5]))
+            
             if self.filewrite_img or self.imshow:
                 cv2.rectangle(img_cp,(x-w,y-h),(x+w,y+h),(0,255,0),2)
                 cv2.rectangle(img_cp,(x-w,y-h-20),(x+w,y-h),(125,125,125),-1)
                 cv2.putText(img_cp,results[i][0] + ' : %.2f' % results[i][5],(x-w+5,y-h-7),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),1)
+            
             if self.filewrite_txt :                
                 ftxt.write(results[i][0] + ',' + str(x) + ',' + str(y) + ',' + str(w) + ',' + str(h)+',' + str(results[i][5]) + '\n')
+        
         if self.filewrite_img : 
-            if self.disp_console : print( '    image file writed : ' + self.tofile_img)
+            if self.disp_console : 
+                print( '    image file writed : ' + self.tofile_img)
             cv2.imwrite(self.tofile_img,img_cp)            
-        if self.imshow :
-            cv2.imshow('YOLO_tiny detection',img_cp)
-            cv2.waitKey(1)
+
         if self.filewrite_txt : 
-            if self.disp_console : print('    txt file writed : ' + self.tofile_txt)
+            if self.disp_console : 
+                print('    txt file writed : ' + self.tofile_txt)
             ftxt.close()
          
         self.tagged_image = img_cp
