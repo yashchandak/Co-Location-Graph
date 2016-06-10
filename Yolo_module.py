@@ -8,6 +8,7 @@ Yolo Detector implementation in TensorFlow
 
 Helpful references:
 1) For Import and segmentation fault with tensorflow (https://github.com/tensorflow/tensorflow/issues/2034)
+2) Base implementation of yolo (https://github.com/gliese581gg/YOLO_tensorflow)
 
 """
 
@@ -16,9 +17,7 @@ import numpy as np
 """  **Official bug**: Import opencv before tensorflow """
 import cv2
 import tensorflow as tf
-
 import time
-import sys
 
 class YOLO_TF:
     img = None

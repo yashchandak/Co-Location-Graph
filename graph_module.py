@@ -11,11 +11,9 @@ TODO
 """
 
 import networkx as nx
-#import matplotlib.pyplot as plt
 
 abs_ratio   = {}
 size_factor = 100
-
 
 def co_location(objects, axf):
     node_sizes  = []
@@ -30,16 +28,13 @@ def co_location(objects, axf):
         for j in range(i+1  ,len(objects)):
             edges.append((i,j))
             weights.append(apx_distance(objects[i], objects[j]))
-            
-    #print(labels)  
-    #print(nodes)
+
     G = nx.Graph()  
     G.add_nodes_from(nodes)
     G.add_edges_from(edges)
     pos = nx.spring_layout(G)
     nx.draw(G, pos, width=weights, node_size=node_sizes, labels=labels, with_labels=True, ax=axf)
-    #plt.show()
- 
+
    
 def apx_distance(x,y):
     #TODO implement distance metric    

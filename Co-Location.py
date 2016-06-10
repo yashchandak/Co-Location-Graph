@@ -7,7 +7,6 @@ Created on Fri Jun 10 15:47:06 2016
 TODO
 1) Use super for setupUi
 2) Batch Process feature
-3) Utilise radio boxes
 
 Helpful references:
 1) For integrating matplotlib with PyQt4 (http://blog.rcnelson.com/building-a-matplotlib-gui-with-qt-designer-part-1/)
@@ -101,10 +100,8 @@ class Main(QMainWindow, Ui_MainWindow):
         self.canvas.close()
 
 
-
 if __name__ == '__main__':
-    import sys
- 
+    import sys 
     app = QtGui.QApplication(sys.argv)
     main = Main()
     main.show()
