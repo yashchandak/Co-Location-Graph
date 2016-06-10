@@ -218,15 +218,18 @@ class YOLO_TF:
         return result
 
     def show_results(self,img,results):
+        self.objects = results
         img_cp = img.copy()
         if self.filewrite_txt :
             ftxt = open(self.tofile_txt,'w')
         for i in range(len(results)):
+            
             x = int(results[i][1])
             y = int(results[i][2])
             w = int(results[i][3])//2
             h = int(results[i][4])//2
-            if self.disp_console : print ('    class : ' + results[i][0] + ' , [x,y,w,h]=[' + str(x) + ',' + str(y) + ',' + str(int(results[i][3])) + ',' + str(int(results[i][4]))+'], Confidence = ' + str(results[i][5]))
+            if self.disp_console : 
+                print ('    class : ' + results[i][0] + ' , [x,y,w,h]=[' + str(x) + ',' + str(y) + ',' + str(int(results[i][3])) + ',' + str(int(results[i][4]))+'], Confidence = ' + str(results[i][5]))
             if self.filewrite_img or self.imshow:
                 cv2.rectangle(img_cp,(x-w,y-h),(x+w,y+h),(0,255,0),2)
                 cv2.rectangle(img_cp,(x-w,y-h-20),(x+w,y-h),(125,125,125),-1)
@@ -244,7 +247,7 @@ class YOLO_TF:
             ftxt.close()
          
         self.tagged_image = img_cp
-        cv2.cvtColor(img_cp, cv2.COLOR_BGR2RGB, self.tagged_image)
+        cv2.cvtColor(img_cp, cv2.COLOR_BGR2RGB, self.tagged_image) #convert the image to RGB format for QT display
 
     def iou(self,box1,box2):
         tb = min(box1[0]+0.5*box1[2],box2[0]+0.5*box2[2])-max(box1[0]-0.5*box1[2],box2[0]-0.5*box2[2])
