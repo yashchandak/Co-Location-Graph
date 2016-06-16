@@ -8,6 +8,10 @@ TODO
 1) Use super for setupUi
 2) Batch Process feature
 
+#imp
+1) training phase with custom data and classes
+2) update classes based on training data
+
 Helpful references:
 1) For integrating matplotlib with PyQt4 (http://blog.rcnelson.com/building-a-matplotlib-gui-with-qt-designer-part-1/)
 
@@ -54,7 +58,7 @@ class Main(QMainWindow, Ui_MainWindow):
         self.scene2.clear()
         self.update_categories()
                 
-        filename = QFileDialog.getOpenFileName()
+        filename = QFileDialog.getOpenFileName(directory = '/home/yash/Downloads/Pascal VOC 2012/samples')
         self.lineEdit.setText(filename)
         
         #DO this step before calling tensorflow

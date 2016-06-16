@@ -23,7 +23,7 @@ def co_location(objects, axf):
     weights     = []
     
     for i in range(len(objects)):
-        labels[i] = objects[i][0]
+        labels[i] = objects[i][0]+'\n(ID: '+ str(objects[i][6]) + ')'
         node_sizes.append( int(size_factor * objects[i][5])**2 )
         for j in range(i+1  ,len(objects)):
             edges.append((i,j))

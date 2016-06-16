@@ -31,10 +31,10 @@ class YOLO_TF:
     alpha = 0.1
     threshold = 0.1
     iou_threshold = 0.5
-    num_class = 20
     num_box = 2
     grid_size = 7
     classes =  ["Aeroplane", "Bicycle", "Bird", "Boat", "Bottle", "Bus", "Car", "Cat", "Chair", "Cow", "Dining Table", "Dog", "Horse", "Motorbike", "Person", "Potted plant", "Sheep", "Sofa", "Train","Tv"]
+    num_class = len(classes)
     categories = {}
     w_img = 640
     h_img = 480
@@ -42,7 +42,8 @@ class YOLO_TF:
     def __init__(self,argvs = []):    
         tf.reset_default_graph() #reset graph variables from the canvas (useful for multiple time execution in same python shell), tf.close() doesn't remove graph variables from canvas.
         self.argv_parser(argvs)         
-        self.build_networks()
+        self.build_networks(training = False)
+        self.training()
          
     def __exit__(self):
         self.sess.close()
@@ -59,8 +60,10 @@ class YOLO_TF:
                 if argvs[i+1] == '1' :self.disp_console = True
                 else : self.disp_console = False
                 
-    def build_networks(self):
-        if self.disp_console : print( "Building YOLO_tiny graph...")
+    def build_networks(self, training = False):
+        if self.disp_console : 
+            print( "Building YOLO_tiny graph...")
+            
         self.x = tf.placeholder('float32',[None,448,448,3])
         self.conv_1 = self.conv_layer(1,self.x,16,3,1)
         self.pool_2 = self.pooling_layer(2,self.conv_1,2,2)
@@ -77,21 +80,34 @@ class YOLO_TF:
         self.conv_13 = self.conv_layer(13,self.pool_12,1024,3,1)
         self.conv_14 = self.conv_layer(14,self.conv_13,1024,3,1)
         self.conv_15 = self.conv_layer(15,self.conv_14,1024,3,1)
-        self.fc_16 = self.fc_layer(16,self.conv_15,256,flat=True,linear=False)
-        self.fc_17 = self.fc_layer(17,self.fc_16,4096,flat=False,linear=False)
+        
+                
+        self.fc_16 = self.fc_layer(16,self.conv_15,256,flat=True,linear=False) #Variable_18/19:0
+        self.fc_17 = self.fc_layer(17,self.fc_16,4096,flat=False,linear=False) #Variable_20/21:0
         #skip dropout_18
-        self.fc_19 = self.fc_layer(19,self.fc_17,1470,flat=False,linear=True)
+        self.fc_19 = self.fc_layer(19,self.fc_17, self.grid_size**2*(self.num_box*5 + self.num_class),flat=False,linear=True)  #Variable_22/23:0
+        
+        #start initiliasing the model
         self.sess = tf.Session()
         self.sess.run(tf.initialize_all_variables())
-        self.saver = tf.train.Saver()
+        
+        if training:
+            #restore only selected Variables
+            self.saver = tf.train.Saver([v for v in tf.trainable_variables()  if len(v.name.split('_')) > 1 and int(v.name.split('_')[1].split(':')[0]) <18])
+        else:
+            self.saver = tf.train.Saver()
+            
         self.saver.restore(self.sess,self.weights_file)
-        if self.disp_console : print("Loading complete!\n")
+        
+        if self.disp_console : 
+            print("Loading complete!\n")
 
     def conv_layer(self,idx,inputs,filters,size,stride):
         channels = inputs.get_shape()[3]
         weight = tf.Variable(tf.truncated_normal([size,size,int(channels),filters], stddev=0.1))
         biases = tf.Variable(tf.constant(0.1, shape=[filters]))
 
+        #print(weight.name, biases.name)
         pad_size = size//2
         pad_mat = np.array([[0,0],[pad_size,pad_size],[pad_size,pad_size],[0,0]])
         inputs_pad = tf.pad(inputs,pad_mat)
@@ -119,7 +135,7 @@ class YOLO_TF:
         
         weight = tf.Variable(tf.truncated_normal([dim,hiddens], stddev=0.1))
         biases = tf.Variable(tf.constant(0.1, shape=[hiddens]))    
-        
+        #print(weight.name, biases.name)
         if self.disp_console : 
             print ('    Layer  %d : Type = Full, Hidden = %d, Input dimension = %d, Flat = %d, Activation = %d' % (idx,hiddens,int(dim),int(flat),1-int(linear)))
         if linear : 
@@ -128,6 +144,14 @@ class YOLO_TF:
         ip = tf.add(tf.matmul(inputs_processed,weight),biases)
         return tf.maximum(self.alpha*ip,ip,name=str(idx)+'_fc')
 
+    
+    def training(self): #TODO add training function!
+            
+            return None    
+    
+    
+    
+    
     def detect_from_cvmat(self,img):
         s = time.time()
         self.h_img,self.w_img,_ = img.shape
@@ -171,15 +195,15 @@ class YOLO_TF:
         self.show_results(self.boxes,img)
 
     def interpret_output(self,output):
-        probs = np.zeros((7,7,2,20))
-        class_probs = np.reshape(output[0:980],(7,7,20))
-        scales = np.reshape(output[980:1078],(7,7,2))
-        boxes = np.reshape(output[1078:],(7,7,2,4))
-        offset = np.transpose(np.reshape(np.array([np.arange(7)]*14),(2,7,7)),(1,2,0))
+        probs       = np.zeros((self.grid_size, self.grid_size, self.num_box, self.num_class))
+        class_probs = np.reshape(output[0:self.grid_size**2 * self.num_class],(self.grid_size, self.grid_size, self.num_class))
+        scales      = np.reshape(output[self.grid_size**2 * self.num_class: self.grid_size**2 *(self.num_class + self.num_box)],(self.grid_size, self.grid_size, self.num_box))
+        boxes       = np.reshape(output[self.grid_size**2 *(self.num_class + self.num_box):],(self.grid_size, self.grid_size, self.num_box, 4))
+        offset      = np.transpose(np.reshape(np.array([np.arange(self.grid_size)]*self.num_box*self.grid_size),(self.num_box, self.grid_size, self.grid_size)),(1,2,0))
 
         boxes[:,:,:,0] += offset
         boxes[:,:,:,1] += np.transpose(offset,(1,0,2))
-        boxes[:,:,:,0:2] = boxes[:,:,:,0:2] / 7.0
+        boxes[:,:,:,0:2] = boxes[:,:,:,0:2] / (1.0 * self.grid_size)
         boxes[:,:,:,2] = np.multiply(boxes[:,:,:,2],boxes[:,:,:,2])
         boxes[:,:,:,3] = np.multiply(boxes[:,:,:,3],boxes[:,:,:,3])
         
@@ -188,8 +212,8 @@ class YOLO_TF:
         boxes[:,:,:,2] *= self.w_img
         boxes[:,:,:,3] *= self.h_img
 
-        for i in range(2):
-            for j in range(20):
+        for i in range(self.num_box):
+            for j in range(self.num_class):
                 probs[:,:,i,j] = np.multiply(class_probs[:,:,j],scales[:,:,i])
 
         filter_mat_probs = np.array(probs>=self.threshold,dtype='bool')
@@ -215,10 +239,11 @@ class YOLO_TF:
         classes_num_filtered = classes_num_filtered[filter_iou]
 
         result = []
+        counter = 1
         for i in range(len(boxes_filtered)):
             if (self.categories[self.classes[classes_num_filtered[i]]] or self.categories['All']):
-                result.append([self.classes[classes_num_filtered[i]],boxes_filtered[i][0],boxes_filtered[i][1],boxes_filtered[i][2],boxes_filtered[i][3],probs_filtered[i]])
-
+                result.append([self.classes[classes_num_filtered[i]],boxes_filtered[i][0],boxes_filtered[i][1],boxes_filtered[i][2],boxes_filtered[i][3],probs_filtered[i], counter ])
+                counter += 1
         return result
 
     def show_results(self,img,results):
@@ -238,8 +263,8 @@ class YOLO_TF:
             
             if self.filewrite_img or self.imshow:
                 cv2.rectangle(img_cp,(x-w,y-h),(x+w,y+h),(0,255,0),2)
-                cv2.rectangle(img_cp,(x-w,y-h-20),(x+w,y-h),(125,125,125),-1)
-                cv2.putText(img_cp,results[i][0] + ' : %.2f' % results[i][5],(x-w+5,y-h-7),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),1)
+                cv2.rectangle(img_cp,(x-w,y-h-20),(x+w,y-h),(175,175,175),-1)
+                cv2.putText(img_cp,results[i][0]+'(ID: '+ str(results[i][6]) + ')' + ' : %.2f' % results[i][5],(x-w+5,y-h-7),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),2)
             
             if self.filewrite_txt :                
                 ftxt.write(results[i][0] + ',' + str(x) + ',' + str(y) + ',' + str(w) + ',' + str(h)+',' + str(results[i][5]) + '\n')
@@ -264,8 +289,8 @@ class YOLO_TF:
         else : intersection =  tb*lr
         return intersection / (box1[2]*box1[3] + box2[2]*box2[3] - intersection)
 
-    def training(self): #TODO add training function!
-        return None
+    
+    
 
     
    
