@@ -29,7 +29,7 @@ class YOLO_TF:
     disp_console = True
     weights_file = '/home/yash/Project/Yolo/weights/YOLO_tiny.ckpt'
     alpha = 0.1
-    threshold = 0.1
+    threshold = 0.17
     iou_threshold = 0.5
     num_box = 2
     grid_size = 7
@@ -40,10 +40,10 @@ class YOLO_TF:
     h_img = 480
 
     def __init__(self,argvs = []):    
-        tf.reset_default_graph() #reset graph variables from the canvas (useful for multiple time execution in same python shell), tf.close() doesn't remove graph variables from canvas.
+        tf.reset_default_graph() #reset graph variables from the canvas (useful for multiple time execution in same Ipython shell), tf.close() doesn't remove graph variables from canvas.
         self.argv_parser(argvs)         
         self.build_networks(training = False)
-        self.training()
+        #self.training()
          
     def __exit__(self):
         self.sess.close()
@@ -82,10 +82,16 @@ class YOLO_TF:
         self.conv_15 = self.conv_layer(15,self.conv_14,1024,3,1)
         
                 
-        self.fc_16 = self.fc_layer(16,self.conv_15,256,flat=True,linear=False) #Variable_18/19:0
+        self.fc_16 = self.fc_layer(16,self.conv_15,256,flat=True,linear=True) #Variable_18/19:0
         self.fc_17 = self.fc_layer(17,self.fc_16,4096,flat=False,linear=False) #Variable_20/21:0
-        #skip dropout_18
-        self.fc_19 = self.fc_layer(19,self.fc_17, self.grid_size**2*(self.num_box*5 + self.num_class),flat=False,linear=True)  #Variable_22/23:0
+        
+        if training:
+            self.keep_prob = tf.placeholder(tf.float32)
+            self.fc_18 = tf.nn.dropout(self.fc_17, self.keep_prob)
+            self.fc_19 = self.fc_layer(19,self.fc_18, self.grid_size**2*(self.num_box*5 + self.num_class),flat=False,linear=True)  #Variable_22/23:0
+        else:
+            #skip dropout_18
+            self.fc_19 = self.fc_layer(19,self.fc_17, self.grid_size**2*(self.num_box*5 + self.num_class),flat=False,linear=True)  #Variable_22/23:0
         
         #start initiliasing the model
         self.sess = tf.Session()
@@ -93,7 +99,8 @@ class YOLO_TF:
         
         if training:
             #restore only selected Variables
-            self.saver = tf.train.Saver([v for v in tf.trainable_variables()  if len(v.name.split('_')) > 1 and int(v.name.split('_')[1].split(':')[0]) <18])
+            self.saver      = tf.train.Saver([v for v in tf.trainable_variables()  if len(v.name.split('_')) > 1 and int(v.name.split('_')[1].split(':')[0]) <18])
+            self.saver_all  = tf.train.Saver()  #to save all the tensors after training 
         else:
             self.saver = tf.train.Saver()
             
@@ -146,10 +153,57 @@ class YOLO_TF:
 
     
     def training(self): #TODO add training function!
+        learning_rate = 0.0001
+        momentum = 0.9
+        decay = 0.0005
+        batch_size = 64
+        
+        object_scale=1
+        noobject_scale=.5
+        class_scale=1
+        coord_scale=5
+     
+        class_probs = tf.slice(self.fc_19, [0], [self.grid_size**2 * self.num_class])
+        scales      = tf.slice(self.fc_19, [self.grid_size**2 * self.num_class], [self.grid_size**2 * self.num_box])
+        boxes       = tf.slice(self.fc_19, [self.grid_size**2 *(self.num_class + self.num_box)], [-1])
+
+        
+#        # Define loss and optimizer
+#        cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y))
+#        optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
+#        
+#        # Evaluate model
+#        correct_pred = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
+#        accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+#        
+#        # Launch the graph
+#        with tf.Session() as sess:
+#            sess.run(init)
+#            step = 1
+#            # Keep training until reach max iterations
+#            while step * batch_size < training_iters:
+#                batch_x, batch_y = mnist.train.next_batch(batch_size)
+#                # Run optimization op (backprop)
+#                sess.run(optimizer, feed_dict={x: batch_x, y: batch_y,
+#                                               keep_prob: dropout})
+#                if step % display_step == 0:
+#                    # Calculate batch loss and accuracy
+#                    loss, acc = sess.run([cost, accuracy], feed_dict={x: batch_x,
+#                                                                      y: batch_y,
+#                                                                      keep_prob: 1.})
+#                    print "Iter " + str(step*batch_size) + ", Minibatch Loss= " + \
+#                          "{:.6f}".format(loss) + ", Training Accuracy= " + \
+#                          "{:.5f}".format(acc)
+#                step += 1
+#            print "Optimization Finished!"
+#        
+#            # Calculate accuracy for 256 mnist test images
+#            print "Testing Accuracy:", \
+#                sess.run(accuracy, feed_dict={x: mnist.test.images[:256],
+#                                              y: mnist.test.labels[:256],
+#                                              keep_prob: 1.})          
             
-            return None    
-    
-    
+#        return None    
     
     
     def detect_from_cvmat(self,img):
@@ -162,9 +216,8 @@ class YOLO_TF:
         inputs[0] = (img_resized_np/255.0)*2.0-1.0
         in_dict = {self.x: inputs}
         
-        with self.sess.as_default():
-            net_output = self.sess.run(self.fc_19,feed_dict=in_dict)
-            
+        #with self.sess.as_default():
+        net_output = self.sess.run(self.fc_19,feed_dict=in_dict)  
         self.result = self.interpret_output(net_output[0])
         self.show_results(img,self.result)
         strtime = str(time.time()-s)
@@ -178,21 +231,6 @@ class YOLO_TF:
          #img = misc.imread(filename)         
          self.detect_from_cvmat(self.img)
 
-    def detect_from_crop_sample(self):
-        self.w_img = 640
-        self.h_img = 420
-        f = np.array(open('person_crop.txt','r').readlines(),dtype='float32')
-        inputs = np.zeros((1,448,448,3),dtype='float32')
-        for c in range(3):
-            for y in range(448):
-                for x in range(448):
-                    inputs[0,y,x,c] = f[c*448*448+y*448+x]
-
-        in_dict = {self.x: inputs}
-        net_output = self.sess.run(self.fc_19,feed_dict=in_dict)
-        self.boxes, self.probs = self.interpret_output(net_output[0])
-        img = cv2.imread('person.jpg')
-        self.show_results(self.boxes,img)
 
     def interpret_output(self,output):
         probs       = np.zeros((self.grid_size, self.grid_size, self.num_box, self.num_class))
@@ -264,7 +302,7 @@ class YOLO_TF:
             if self.filewrite_img or self.imshow:
                 cv2.rectangle(img_cp,(x-w,y-h),(x+w,y+h),(0,255,0),2)
                 cv2.rectangle(img_cp,(x-w,y-h-20),(x+w,y-h),(175,175,175),-1)
-                cv2.putText(img_cp,results[i][0]+'(ID: '+ str(results[i][6]) + ')' + ' : %.2f' % results[i][5],(x-w+5,y-h-7),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),2)
+                cv2.putText(img_cp,results[i][0]+'('+ str(results[i][6]) + ')' + ' : %.2f' % results[i][5],(x-w+5,y-h-7),cv2.FONT_HERSHEY_SIMPLEX,0.25,(0,0,0),1)
             
             if self.filewrite_txt :                
                 ftxt.write(results[i][0] + ',' + str(x) + ',' + str(y) + ',' + str(w) + ',' + str(h)+',' + str(results[i][5]) + '\n')
@@ -289,7 +327,21 @@ class YOLO_TF:
         else : intersection =  tb*lr
         return intersection / (box1[2]*box1[3] + box2[2]*box2[3] - intersection)
 
-    
+    def detect_from_crop_sample(self):
+        self.w_img = 640
+        self.h_img = 420
+        f = np.array(open('person_crop.txt','r').readlines(),dtype='float32')
+        inputs = np.zeros((1,448,448,3),dtype='float32')
+        for c in range(3):
+            for y in range(448):
+                for x in range(448):
+                    inputs[0,y,x,c] = f[c*448*448+y*448+x]
+
+        in_dict = {self.x: inputs}
+        net_output = self.sess.run(self.fc_19,feed_dict=in_dict)
+        self.boxes, self.probs = self.interpret_output(net_output[0])
+        img = cv2.imread('person.jpg')
+        self.show_results(self.boxes,img) 
     
 
     
