@@ -35,7 +35,7 @@ class YOLO_TF:
     grid_size = 7
     classes =  ["Aeroplane", "Bicycle", "Bird", "Boat", "Bottle", "Bus", "Car", "Cat", "Chair", "Cow", "Dining Table", "Dog", "Horse", "Motorbike", "Person", "Potted plant", "Sheep", "Sofa", "Train","Tv"]
     num_class = len(classes)
-    categories = {}
+    #categories = {}
     w_img = 640
     h_img = 480
 
@@ -228,6 +228,7 @@ class YOLO_TF:
          if self.disp_console : 
              print('Detect from ' + filename)
          self.img = cv2.imread(filename)
+         self.img = cv2.resize(self.img, (640, 480))
          #img = misc.imread(filename)         
          self.detect_from_cvmat(self.img)
 
@@ -279,13 +280,11 @@ class YOLO_TF:
         result = []
         counter = 1
         for i in range(len(boxes_filtered)):
-            if (self.categories[self.classes[classes_num_filtered[i]]] or self.categories['All']):
-                result.append([self.classes[classes_num_filtered[i]],boxes_filtered[i][0],boxes_filtered[i][1],boxes_filtered[i][2],boxes_filtered[i][3],probs_filtered[i], counter ])
-                counter += 1
+            result.append([self.classes[classes_num_filtered[i]],boxes_filtered[i][0],boxes_filtered[i][1],boxes_filtered[i][2],boxes_filtered[i][3],probs_filtered[i], counter ])
+            counter += 1
         return result
 
     def show_results(self,img,results):
-        self.objects = results
         img_cp = img.copy()
         if self.filewrite_txt :
             ftxt = open(self.tofile_txt,'w')
@@ -302,7 +301,7 @@ class YOLO_TF:
             if self.filewrite_img or self.imshow:
                 cv2.rectangle(img_cp,(x-w,y-h),(x+w,y+h),(0,255,0),2)
                 cv2.rectangle(img_cp,(x-w,y-h-20),(x+w,y-h),(175,175,175),-1)
-                cv2.putText(img_cp,results[i][0]+'('+ str(results[i][6]) + ')' + ' : %.2f' % results[i][5],(x-w+5,y-h-7),cv2.FONT_HERSHEY_SIMPLEX,0.25,(0,0,0),1)
+                cv2.putText(img_cp,results[i][0]+'('+ str(results[i][6]) + ')' + ':%.1f' % results[i][5],(x-w+5,y-h-7),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,0,0),2)
             
             if self.filewrite_txt :                
                 ftxt.write(results[i][0] + ',' + str(x) + ',' + str(y) + ',' + str(w) + ',' + str(h)+',' + str(results[i][5]) + '\n')

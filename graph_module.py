@@ -12,25 +12,29 @@ TODO
 
 import networkx as nx
 import numpy as np
-#Every ratio relative to person
+#Every size relative to person
 classes_ratio =  {"Aeroplane" : 1500 , "Bicycle" : 150, "Bird" : 20, "Boat" : 200, "Bottle" : 20, "Bus" : 500, "Car" : 250, "Cat" : 30, "Chair" : 80, "Cow" : 200, "Dining Table" : 150, "Dog" : 40, "Horse" : 150, "Motorbike" : 150, "Person" : 100, "Potted plant" : 50, "Sheep" : 80, "Sofa" : 150, "Train" : 500,"Tv" : 50}
    
 size_factor = 100
 
-def co_location(objects, axf):
+def co_location(all_objects, axf, thresh, selected):
     node_sizes  = []
     labels      = {}
     edge_labels = {}
-    nodes       = [i for i in range(len(objects))]
     edges       = []
     weights     = []
     
-    for i in range(len(objects)):
+    objects = [obj for obj in all_objects if (selected['All'] or selected[obj[0]])]    
+    nodes       = [i for i in range(len(objects))]
+    
+    for i in range(len(objects)):            
         labels[i] = objects[i][0]+'\n(ID: '+ str(objects[i][6]) + ')'
         node_sizes.append( int(size_factor * objects[i][5])**2 )
-        for j in range(i+1  ,len(objects)):
-            edges.append((i,j))
+        for j in range(i+1  ,len(objects)):            
             d = apx_distance(objects[i], objects[j])
+            if (d > thresh): 
+                continue                
+            edges.append((i,j))
             edge_labels[(i,j)]=str("%0.1f" %(d))
             weights.append(1)
     
@@ -60,7 +64,7 @@ def apx_distance(x,y):
     curr_ratio  = (x[3]*x[4])/(y[3]*y[4])
     act_ratio   = classes_ratio[x[0]]/classes_ratio[y[0]]
     z_ratio     = max(curr_ratio, act_ratio)/min(curr_ratio, act_ratio)
-    dist        = .01* np.sqrt( (x[1] - y[1])**2 + (x[2] - y[2])**2)*z_ratio
+    dist        = 0.1* np.sqrt( (x[1] - y[1])**2 + (x[2] - y[2])**2)*z_ratio
     print ('%s : %s : %f : %f : %f : %f ' % (x[0], y[0], curr_ratio, act_ratio, z_ratio, max(1, int(dist))))
     return dist
     
