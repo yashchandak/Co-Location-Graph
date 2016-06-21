@@ -35,7 +35,8 @@ class YOLO_TF:
     grid_size = 7
     classes =  ["Aeroplane", "Bicycle", "Bird", "Boat", "Bottle", "Bus", "Car", "Cat", "Chair", "Cow", "Dining Table", "Dog", "Horse", "Motorbike", "Person", "Potted plant", "Sheep", "Sofa", "Train","Tv"]
     num_class = len(classes)
-    #categories = {}
+    counter = 1
+    batch = 0
     w_img = 640
     h_img = 480
 
@@ -142,7 +143,6 @@ class YOLO_TF:
         
         weight = tf.Variable(tf.truncated_normal([dim,hiddens], stddev=0.1))
         biases = tf.Variable(tf.constant(0.1, shape=[hiddens]))    
-        #print(weight.name, biases.name)
         if self.disp_console : 
             print ('    Layer  %d : Type = Full, Hidden = %d, Input dimension = %d, Flat = %d, Activation = %d' % (idx,hiddens,int(dim),int(flat),1-int(linear)))
         if linear : 
@@ -228,7 +228,11 @@ class YOLO_TF:
          if self.disp_console : 
              print('Detect from ' + filename)
          self.img = cv2.imread(filename)
-         self.img = cv2.resize(self.img, (640, 480))
+         
+         if self.img == None:                     #Display error if image has nothing
+            print( 'Error! Blank Image : ' + filename)
+            return
+         #self.img = cv2.resize(self.img, (640, 480))
          #img = misc.imread(filename)         
          self.detect_from_cvmat(self.img)
 
@@ -278,10 +282,12 @@ class YOLO_TF:
         classes_num_filtered = classes_num_filtered[filter_iou]
 
         result = []
-        counter = 1
+        if not self.batch : 
+            self.counter = 1 #reset counter if individual images are being evaluated
+        
         for i in range(len(boxes_filtered)):
-            result.append([self.classes[classes_num_filtered[i]],boxes_filtered[i][0],boxes_filtered[i][1],boxes_filtered[i][2],boxes_filtered[i][3],probs_filtered[i], counter ])
-            counter += 1
+            result.append([self.classes[classes_num_filtered[i]],boxes_filtered[i][0],boxes_filtered[i][1],boxes_filtered[i][2],boxes_filtered[i][3],probs_filtered[i], self.counter ])
+            self.counter += 1
         return result
 
     def show_results(self,img,results):
@@ -326,21 +332,6 @@ class YOLO_TF:
         else : intersection =  tb*lr
         return intersection / (box1[2]*box1[3] + box2[2]*box2[3] - intersection)
 
-    def detect_from_crop_sample(self):
-        self.w_img = 640
-        self.h_img = 420
-        f = np.array(open('person_crop.txt','r').readlines(),dtype='float32')
-        inputs = np.zeros((1,448,448,3),dtype='float32')
-        for c in range(3):
-            for y in range(448):
-                for x in range(448):
-                    inputs[0,y,x,c] = f[c*448*448+y*448+x]
-
-        in_dict = {self.x: inputs}
-        net_output = self.sess.run(self.fc_19,feed_dict=in_dict)
-        self.boxes, self.probs = self.interpret_output(net_output[0])
-        img = cv2.imread('person.jpg')
-        self.show_results(self.boxes,img) 
     
 
     
