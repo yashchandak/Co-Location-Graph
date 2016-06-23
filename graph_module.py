@@ -12,6 +12,7 @@ TODO
 
 import networkx as nx
 import numpy as np
+from force_atlas2_layout import forceatlas2_layout
 #Every size relative to person
 classes_ratio =  {"Aeroplane" : 1500 , "Bicycle" : 150, "Bird" : 20, "Boat" : 200, "Bottle" : 20, "Bus" : 500, "Car" : 250, "Cat" : 30, "Chair" : 80, "Cow" : 200, "Dining Table" : 150, "Dog" : 40, "Horse" : 150, "Motorbike" : 150, "Person" : 100, "Potted plant" : 50, "Sheep" : 80, "Sofa" : 150, "Train" : 500,"Tv" : 50}
    
@@ -23,40 +24,44 @@ def co_location(all_results, axf, thresh, selected):
     edge_labels = {}
     edges       = []
     weights     = []
-    filtered_results = []
-    #keep only the objects falling under selected classes
-    #objects = [obj  for result in all_results   for obj in result  if (selected['All'] or selected[obj[0]])]    
+    filtered_results = [] 
+    
     if len(all_results) == 0:
         return
     
     for result in all_results:
+        #keep only the objects falling under selected classes  
         filtered_results.append([obj   for obj in result  if (selected['All'] or selected[obj[0]])])
         
-    print (filtered_results)
-    nodes   = [obj[6]  for result in filtered_results   for obj in result  if (selected['All'] or selected[obj[0]])]
+    #print (filtered_results)
+    nodes   = [obj[6]  for result in filtered_results   for obj in result] #nodes = ID of the filtered objects
     
     for objects in filtered_results:
-        for i in range(len(objects)):            
-            labels[(objects[i][6])] = objects[i][0]+'\n(ID: '+ str(objects[i][6]) + ')'
-            node_sizes.append( int(size_factor * objects[i][5])**2 )
+        for i in range(len(objects)):  
             
-            for j in range(i+1  ,len(objects)):             
+            labels[(objects[i][6])] = objects[i][0]+'\n(ID: '+ str(objects[i][6]) + ')' #set labels for each node based on ID
+            node_sizes.append( int(size_factor * objects[i][5])**2 )                    #size of nodes depend on it's detection confidence
+            
+            for j in range(i+1  ,len(objects)):  
+                #all objects within an image interact with one another
                 d = apx_distance(objects[i], objects[j])
                 if (d > thresh):  #filter based on apx distance
                     continue                
                 
                 edges.append((objects[i][6], objects[j][6]))
-                edge_labels [(objects[i][6], objects[j][6])]=str("%0.1f" %(d))
+                edge_labels [(objects[i][6], objects[j][6])] = str("%0.1f" %(d))
                 weights.append(1) #constant weights for edge width, for time being
     
     if len(weights): 
+        #TODO [unused right now] change width of the edges based on weights
         maxim = max(weights)
         weights = [max(1, 3*maxim/w) for w in weights]
     
     G = nx.Graph()  
     G.add_nodes_from(nodes)
     G.add_edges_from(edges)
-    pos = nx.spring_layout(G, k = 0.45)
+    #pos = nx.spring_layout(G, k = 0.45)
+    pos = forceatlas2_layout(G, iterations =5)
     
     #Disable x-y axis and make plot area white
     cf = axf.get_figure()
@@ -64,6 +69,7 @@ def co_location(all_results, axf, thresh, selected):
     axf = cf.gca()
     axf.set_axis_off()
     
+    #draw all the graph objects
     nx.draw_networkx_nodes(G, pos, node_size = node_sizes, ax=axf)
     nx.draw_networkx_edges(G, pos, width = weights, edge_color = 'g', ax=axf)
     nx.draw_networkx_labels(G, pos, labels = labels, ax=axf)

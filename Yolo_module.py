@@ -9,6 +9,12 @@ Yolo Detector implementation in TensorFlow
 Helpful references:
 1) For Import and segmentation fault with tensorflow (https://github.com/tensorflow/tensorflow/issues/2034)
 2) Base implementation of yolo (https://github.com/gliese581gg/YOLO_tensorflow)
+3) Paper : https://arxiv.org/pdf/1506.02640
+
+TODO
+1) training phase with custom data and classes
+2) update classes based on training data
+3) improve NMS
 
 """
 
@@ -29,7 +35,7 @@ class YOLO_TF:
     disp_console = True
     weights_file = '/home/yash/Project/Yolo/weights/YOLO_tiny.ckpt'
     alpha = 0.1
-    threshold = 0.17
+    threshold = 0.15
     iou_threshold = 0.5
     num_box = 2
     grid_size = 7
@@ -232,7 +238,7 @@ class YOLO_TF:
          if self.img == None:                     #Display error if image has nothing
             print( 'Error! Blank Image : ' + filename)
             return
-         #self.img = cv2.resize(self.img, (640, 480))
+         self.img = cv2.resize(self.img, (640, 480))
          #img = misc.imread(filename)         
          self.detect_from_cvmat(self.img)
 
@@ -331,8 +337,3 @@ class YOLO_TF:
         if tb < 0 or lr < 0 : intersection = 0
         else : intersection =  tb*lr
         return intersection / (box1[2]*box1[3] + box2[2]*box2[3] - intersection)
-
-    
-
-    
-   

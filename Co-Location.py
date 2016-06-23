@@ -4,16 +4,12 @@ Created on Fri Jun 10 15:47:06 2016
 
 @author: yash
 
+Helpful references:
+1) For integrating matplotlib with PyQt4 (http://blog.rcnelson.com/building-a-matplotlib-gui-with-qt-designer-part-1/)
+
 TODO
 1) Use super for setupUi
 2) Batch Process feature
-
-#imp
-1) training phase with custom data and classes
-2) update classes based on training data
-
-Helpful references:
-1) For integrating matplotlib with PyQt4 (http://blog.rcnelson.com/building-a-matplotlib-gui-with-qt-designer-part-1/)
 
 """
 from __future__ import print_function
@@ -55,8 +51,8 @@ class Main(QMainWindow, Ui_MainWindow):
         self.pushButton_2.clicked.connect(self.disp_graph)
         self.pushButton_3.clicked.connect(self.selectFile_from_folder)
         
-        #TODO [WEIRD PROBLEM] QPixmap needs tobe called at least once before tensorFlow, otherwise program crashes
-        self.scene.addPixmap(QPixmap(os.getcwd()+"/demo.png").scaled(self.graphicsView.size(), QtCore.Qt.KeepAspectRatio))
+        #TODO [WEIRD PROBLEM] QPixmap needs to be called at least once with JPG image before tensorFlow, otherwise program crashes
+        self.scene.addPixmap(QPixmap(os.getcwd()+"/demo.jpg").scaled(self.graphicsView.size(), QtCore.Qt.KeepAspectRatio))
         self.graphicsView.setScene(self.scene)  
         
         #Add blank canvas initially
@@ -88,10 +84,10 @@ class Main(QMainWindow, Ui_MainWindow):
         #DO this step before calling tensorflow
         self.scene.addPixmap(QPixmap(filename).scaled(self.graphicsView.size(), QtCore.Qt.KeepAspectRatio))
         self.graphicsView.setScene(self.scene)   
-        print("Debug2")
+        
         #Dislplay tagged image        
         image = self.tag_image(filename)      
-        print("Debug 3")
+        
         image = QtGui.QImage(image, image.shape[1], image.shape[0], image.shape[1] * 3,QtGui.QImage.Format_RGB888)  #convert to Qt image format      
         self.scene2.addPixmap(QPixmap(image).scaled(self.graphicsView_3.size(), QtCore.Qt.KeepAspectRatio))
         self.graphicsView_3.setScene(self.scene2)        
@@ -117,11 +113,10 @@ class Main(QMainWindow, Ui_MainWindow):
         self.scene.clear()
         self.scene2.clear()
         self.update_categories()
-        print("Debug 0")       
+             
         filename = QFileDialog.getOpenFileName(directory = '/home/yash/Downloads/Pascal VOC 2012/samples')
         self.lineEdit.setText(filename)
         
-        print("Debug 1")
         self.disp_img(filename)
         self.disp_graph([self.classifier.result]) #list of 1 resultant list
         
@@ -141,7 +136,11 @@ class Main(QMainWindow, Ui_MainWindow):
             
             self.tag_image(filename, batch = True)
             self.batch_results.append( self.classifier.result) #list of all resultant lists
-            
+        
+        #clear the image regions during batch upload
+        self.scene.clear()
+        self.scene2.clear()    
+        
         self.disp_graph(self.batch_results)
         
     def addmpl(self, fig):
