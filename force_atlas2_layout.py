@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 
 ## Now the layout function
 def forceatlas2_layout(G, iterations=10, linlog=False, pos=None, nohubs=False,
-                       kr=0.001, k=None, dim=2):
+                       kr=0.001, k=None, dim=2, min_dist = 0.01):
     """
     Options values are
     g                The graph to layout
@@ -58,7 +58,7 @@ def forceatlas2_layout(G, iterations=10, linlog=False, pos=None, nohubs=False,
         # Iterations
     # the initial "temperature" is about .1 of domain area (=1x1)
     # this is the largest step allowed in the dynamics.
-    t = 0.1
+    t = 0.3
     # simple cooling scheme.
     # linearly step down by dt on each iteration so last iteration is size dt.
     dt = t / float(iterations + 1)
@@ -72,7 +72,7 @@ def forceatlas2_layout(G, iterations=10, linlog=False, pos=None, nohubs=False,
             # distance between points
             distance = np.sqrt((delta ** 2).sum(axis=0))
             # enforce minimum distance of 0.01
-            distance = np.where(distance < 0.01, 0.01, distance)
+            distance = np.where(distance < min_dist, min_dist, distance)
             # the adjacency matrix row
             Ai = np.asarray(A.getrowview(i).toarray())
             # displacement "force"
@@ -83,9 +83,10 @@ def forceatlas2_layout(G, iterations=10, linlog=False, pos=None, nohubs=False,
                 Dist = np.log(Dist + 1)
             displacement[:, i] += \
                 (delta * (Dist - Ai * distance / k)).sum(axis=1)
-            # update positions
+        
+        # update positions
         length = np.sqrt((displacement ** 2).sum(axis=0))
-        length = np.where(length < 0.01, 0.01, length)
+        length = np.where(length < min_dist, min_dist, length)
         pos += (displacement * t / length).T
         # cool temperature
         t -= dt

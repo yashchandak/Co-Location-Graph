@@ -15,6 +15,7 @@ TODO
 1) training phase with custom data and classes
 2) update classes based on training data
 3) improve NMS
+4) clean up code, multiple copies of images with different sizes and name
 
 """
 
@@ -35,7 +36,7 @@ class YOLO_TF:
     disp_console = True
     weights_file = '/home/yash/Project/Yolo/weights/YOLO_tiny.ckpt'
     alpha = 0.1
-    threshold = 0.15
+    threshold = 0.2
     iou_threshold = 0.5
     num_box = 2
     grid_size = 7
@@ -223,7 +224,9 @@ class YOLO_TF:
         in_dict = {self.x: inputs}
         
         #with self.sess.as_default():
+        st = time.time()
         net_output = self.sess.run(self.fc_19,feed_dict=in_dict)  
+        print("yolo time: "+ str(time.time()-st))
         self.result = self.interpret_output(net_output[0])
         self.show_results(img,self.result)
         strtime = str(time.time()-s)
