@@ -8,8 +8,7 @@ Helpful references:
 1) For integrating matplotlib with PyQt4 (http://blog.rcnelson.com/building-a-matplotlib-gui-with-qt-designer-part-1/)
 
 TODO
-1) Use super for setupUi
-2) Batch Process feature
+1) 
 
 """
 from __future__ import print_function
@@ -19,7 +18,6 @@ import os
 from PyQt4 import QtCore, QtGui
 from PyQt4.uic import loadUiType
 from PyQt4.QtGui import QGraphicsScene, QFileDialog, QPixmap
-from PyQt4.QtCore import QThread, SIGNAL
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas

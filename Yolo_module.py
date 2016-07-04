@@ -46,7 +46,7 @@ class YOLO_TF:
     batch = 0
     w_img = 640
     h_img = 480
-    temp = "initialised"
+    
     def __init__(self,argvs = []):    
         tf.reset_default_graph() #reset graph variables from the canvas (useful for multiple time execution in same Ipython shell), tf.close() doesn't remove graph variables from canvas.
         self.argv_parser(argvs)         
