@@ -11,116 +11,138 @@ import os
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.uic import loadUiType
-from PyQt4.QtGui import QGraphicsScene, QFileDialog, QPixmap, QTableWidgetItem, QIcon, QLabel, QWidget
+from PyQt4.QtGui import QGraphicsScene, QFileDialog, QPixmap
 
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-
+from heapq import nsmallest
+import pickle
 import cv2
 
 Ui_MainWindow, QMainWindow = loadUiType('CBIR_gui.ui')
 
 class ImgWidget(QtGui.QLabel):
-
-    def __init__(self, parent=None, imagePath = ''):
-        super(ImgWidget, self).__init__(parent)
+    ##IMP: IF using QtDesigner to make tables, make sure to set default row, column to non zero values
+    ##otherwise it doesn't seem to work [Weird Bug]
+    def __init__(self, parent=None, imagePath = '', size = 50):
+        super(ImgWidget, self).__init__(parent)        
         pic = QtGui.QPixmap(imagePath)
+        if pic.height()>pic.width(): pic=pic.scaledToWidth(size)
+        else: pic=pic.scaledToHeight(size)
         self.setAlignment(QtCore.Qt.AlignCenter)
         self.setPixmap(pic)
 
 
-class CBIR(QMainWindow, Ui_MainWindow, QWidget):
+class CBIR(QMainWindow, Ui_MainWindow):
     flag = True
     categories = {}
     valid_images = ["jpg","png","tga", "pgm", "jpeg"]
     valid_videos = ["mp4", "avi"]
     edge_threshold = 100
+    topk = 10
     to_disp = [] 
     stop = False
-
-    THUMBNAIL_SIZE = 48
-    SPACING = 10
-    IMAGES_PER_ROW = 1 
+    database_path = ''
+    thumbnail_size = 256
+    spacing = 40
+    images_per_row = 2 
+    cached_db = []
+    cached_db_path = ''
     
     def __init__(self, ):
         super(CBIR, self).__init__()        #initialise from the ui designed by Designer App
         self.setupUi(self)
-        #self.setupUi_custom()
+        self.setupUi_custom()
         
-        self.tableWidget.setMinimumWidth((self.THUMBNAIL_SIZE+self.SPACING)*self.IMAGES_PER_ROW+(self.SPACING*2))
         path = '/home/yash/Project/dataset/Pascal VOC 2012/samples'
         pictures = []
         for f in os.listdir(path):              #list all the files in the folder
             ext = f.split('.')[1]        #get the file extension
             if ext.lower() not in self.valid_images: continue#check if the extension is valid for the image
             pictures.append(path+'/'+f )
+        self.show_similar(pictures)
+   
+    def setupUi_custom(self,):    
+        self.scene = QGraphicsScene()
+        self.scene2 = QGraphicsScene()
+        self.pushButton.clicked.connect(self.select_image)
+        self.pushButton_2.clicked.connect(self.find_similar)
+        self.pushButton_3.clicked.connect(self.select_database)
+        self.horizontalSlider.valueChanged.connect(self.update_LCD)
+        #TODO [WEIRD PROBLEM] QPixmap needs to be called at least once with JPG image before tensorFlow, otherwise program crashes
+        self.scene.addPixmap(QPixmap(os.getcwd()+"/demo.jpg").scaled(self.graphicsView.size(), QtCore.Qt.KeepAspectRatio))
+        self.graphicsView.setScene(self.scene)  
         
-        #self.tableWidget2 = QtGui.QTableWidget(2, 1, self)
-        #self.tableWidget2.setGeometry(QtCore.QRect(570, 20, 741, 611))
-        #self.tableWidget.setObjectName(_fromUtf8("tableWidget"))
-        #self.tableWidget.setColumnCount(0)
+    def show_similar(self, pictures):
+        self.tableWidget.setMinimumWidth((self.thumbnail_size+self.spacing)*self.images_per_row+(self.spacing*2))
         
-        #pictures = ['2007_001627.jpg', '2007_001630.jpg']
-        rowCount=len(pictures)//self.IMAGES_PER_ROW
-        if len(pictures)%self.IMAGES_PER_ROW: rowCount+=1
+        rowCount=len(pictures)//self.images_per_row
+        if len(pictures)%self.images_per_row: rowCount+=1
         self.tableWidget.setRowCount(rowCount)
     
         row=-1
         for i,picture in enumerate(pictures):
-            col=i%self.IMAGES_PER_ROW
+            col=i%self.images_per_row
             if not col: row+=1
-            self.tableWidget.setCellWidget(row, 0,  ImgWidget(imagePath = picture))
-
-###########################            
-#            item=QTableWidgetItem()
-#        
-#            # Scale the image by either height or width and then 'crop' it to the
-#            # desired size, this prevents distortion of the image.
-#            p=QPixmap(picture)
-#            if p.height()>p.width(): p=p.scaledToWidth(self.THUMBNAIL_SIZE)
-#            else: p=p.scaledToHeight(self.THUMBNAIL_SIZE)
-#            p=p.copy(0,0,self.THUMBNAIL_SIZE,self.THUMBNAIL_SIZE)
-#            item.setIcon(QIcon(p))
-#        
-#            self.tableWidget.setItem(row,col,item)
-
+            self.tableWidget.setCellWidget(row, col,  ImgWidget(imagePath = picture, size=self.thumbnail_size))            
     
-    def addPicture(self, row, col, picturePath):
-        item=QTableWidgetItem()
+    def find_similar(self, results):
+        #do pattern matching on the images in retrieved cached_db
+        #keep top 10
+        #display the top 10 imags on right
+        if self.database_path == '':
+            print("Database file not selected")
+            self.select_database()
+        
+        
+        found = False        
+        if self.cached_db_path == self.database_path:
+            #No need to re-read from cPickle if it's re-run on the same db
+            found = True
+        
+        else:
+            self.cached_db_path = self.database_path
+            for f in os.listdir(self.database_path):              #list all the files in the folder
+                ext = f.split('.')[1]        #get the file extension
+                if ext.lower() == 'p':      #check for pickled cached_db file
+                    self.cached_db = pickle.load(self.database_path+'/'+f)
+                    found = True
+                    break
+        
+        if not found:
+            self.cached_db = self.make_db()
+            
+        best_matches = nsmallest(self.topk, self.cached_db.keys(), \
+                                key = lambda e: self.difference(self.cached_db[e], results))
+        
+        self.show_similar(best_matches)
     
-        # Scale the image by either height or width and then 'crop' it to the
-        # desired size, this prevents distortion of the image.
-        p=QPixmap(picturePath)
-        if p.height()>p.width(): p=p.scaledToWidth(self.THUMBNAIL_SIZE)
-        else: p=p.scaledToHeight(self.THUMBNAIL_SIZE)
-        p=p.copy(0,0,self.THUMBNAIL_SIZE,self.THUMBNAIL_SIZE)
-        item.setIcon(QIcon(p))
+    def difference(self, g1, g2):
+        #compute weighted sum of square diff
+        #or
+        #compute cross entropy diff from normalised vectors
+        #or
+        #using some other function which involves the graph edge weights also
+        print("TODO")
+        return #difference measure
     
-        self.tableWidget.setItem(row,col,item)    
     
+    def make_db(self):
+        #stor entire image paths
+        #store class vectors
+        #store the other results also, including the graph edge weights
+        print("Todo")
+        
+    def select_database(self):
+        #Read all the images in the folder
+        path = QFileDialog.getExistingDirectory(None, 'Select a folder:', '/home/yash/Downloads/Pascal VOC 2012', QtGui.QFileDialog.ShowDirsOnly)
+        self.lineEdit_2.setText(path)   
+        self.database_path = path
     
     def update_categories(self):
         #update selected categories
         for radiobox in self.findChildren(QtGui.QRadioButton):
             self.categories[radiobox.text()] = radiobox.isChecked()
-         
-    def setupUi_custom(self,):    
-        self.scene = QGraphicsScene()
-        self.scene2 = QGraphicsScene()
-        self.pushButton.clicked.connect(self.selectFile)        
-        self.horizontalSlider.valueChanged.connect(self.updateLCD)
-        self.pushButton_2.clicked.connect(self.disp_graph)
-        self.pushButton_3.clicked.connect(self.selectFile_from_folder)
-        self.stop_button.clicked.connect(self.set_stop)
-        #TODO [WEIRD PROBLEM] QPixmap needs to be called at least once with JPG image before tensorFlow, otherwise program crashes
-        self.scene.addPixmap(QPixmap(os.getcwd()+"/demo.jpg").scaled(self.graphicsView.size(), QtCore.Qt.KeepAspectRatio))
-        self.graphicsView.setScene(self.scene)  
-        
-        #Add blank canvas initially
-        fig1 = Figure()            
-        self.addmpl(fig1)
 
-    def updateLCD(self):
+    def update_LCD(self):
         #update edge_threshold variable based on slider
         self.edge_threshold = self.horizontalSlider.value()
         self.lcdNumber.display(self.edge_threshold)        
@@ -167,7 +189,7 @@ class CBIR(QMainWindow, Ui_MainWindow, QWidget):
         self.graphicsView_3.setScene(self.scene2)        
 
     
-    def selectFile(self):  
+    def select_image(self):  
         #Clear previous image displays        
         self.scene.clear()
         self.scene2.clear()
@@ -176,49 +198,11 @@ class CBIR(QMainWindow, Ui_MainWindow, QWidget):
         filename = QFileDialog.getOpenFileName(directory = '/home/yash/Downloads/Pascal VOC 2012/samples')
         self.lineEdit.setText(filename)
         
-        if filename.split('.')[1] in self.valid_videos:
-            self.disp_video(filename)
-        
-        elif filename.split('.')[1] in self.valid_images:
-            self.disp_img(filename = filename)
-            self.disp_graph([self.classifier.result]) #list of 1 resultant list
-            
+        if filename.split('.')[1] in self.valid_images:
+            self.disp_img(filename = filename) 
+            self.show_similar([self.classifier.result])
         else:
             print("Invalid file format")
-        
-    def selectFile_from_folder(self):
-        #Read all the images in the folder
-        path = QFileDialog.getExistingDirectory(None, 'Select a folder:', '/home/yash/Downloads/Pascal VOC 2012', QtGui.QFileDialog.ShowDirsOnly)
-        self.lineEdit_2.setText(path)
-        
-        
-        self.batch_results = []
-        for f in os.listdir(path):              #list all the files in the folder
-            ext = f.split('.')[1]        #get the file extension
-            if ext.lower() not in self.valid_images: #check if the extension is valid for the image
-                continue
-            filename = path+'/'+f               #create the path of the image
-            print(filename)
-            
-            self.tag_image(filename, batch = True)
-            self.batch_results.append( self.classifier.result) #list of all resultant lists
-        
-        #clear the image regions during batch upload
-        self.scene.clear()
-        self.scene2.clear()    
-        
-        self.disp_graph(self.batch_results)
-        
-    def addmpl(self, fig):
-        #Add figure to canvas and widget
-        self.canvas = FigureCanvas(fig)
-        self.mplvl.addWidget(self.canvas)
-        self.canvas.draw()
- 
-    def rmmpl(self,):
-        #remove the canvas and widget
-        self.mplvl.removeWidget(self.canvas)
-        self.canvas.close()
 
 
 if __name__ == '__main__':
@@ -227,97 +211,3 @@ if __name__ == '__main__':
     cbir = CBIR()
     cbir.show()
     app.exec()
-    
-#    print("DEBUG1")
-#    kill_proc_tree(os.getpid())
-#    print("DEBUG2")
-#    sys.exit(0)
-#    print("DEBUG3")
-
-###################################################################
-
-#
-#from PyQt4.QtCore import *
-#from PyQt4.QtGui import *
-#from PyQt4 import QtGui
-#
-#THUMBNAIL_SIZE = 128
-#SPACING = 10
-#IMAGES_PER_ROW = 5
-#
-#class TableWidget(QTableWidget):
-#    def init(self, parent=None, **kwargs):
-#        QTableWidget.init(self, parent, **kwargs)
-#        self.setMinimumWidth((THUMBNAIL_SIZE+SPACING)*IMAGES_PER_ROW+(SPACING*2))
-#    
-#    def addPicture(self, row, col, picturePath):
-#        item=QTableWidgetItem()
-#    
-#        # Scale the image by either height or width and then 'crop' it to the
-#        # desired size, this prevents distortion of the image.
-#        p=QPixmap(picturePath)
-#        if p.height()>p.width(): p=p.scaledToWidth(THUMBNAIL_SIZE)
-#        else: p=p.scaledToHeight(THUMBNAIL_SIZE)
-#        p=p.copy(0,0,THUMBNAIL_SIZE,THUMBNAIL_SIZE)
-#        item.setIcon(QIcon(p))
-#    
-#        self.setItem(row,col,item)
-#        
-#
-#class MainWindow(QMainWindow):
-#    def init(self, ):
-#        print("here")
-#        QMainWindow.init(self, parent, **kwargs)
-#        centralWidget=QWidget(self)
-#        l=QVBoxLayout(centralWidget)
-#    
-#        self.tableWidget=TableWidget(self)
-#        l.addWidget(self.tableWidget)
-#    
-#        self.setCentralWidget(centralWidget)
-#        
-#        print("here!")#'/home/yash/Project/dataset/Pascal VOC 2012/samples'
-#        picturesPath=QDesktopServices.storageLocation(QDesktopServices.PicturesLocation)
-#        pictureDir=QDir(picturesPath)
-#        pictures=pictureDir.entryList(['*.jpg','*.png','*.gif'])
-#        print(len(pictures))
-#    
-#        rowCount=len(pictures)//IMAGES_PER_ROW
-#        if len(pictures)%IMAGES_PER_ROW: rowCount+=1
-#        self.tableWidget.setRowCount(rowCount)
-#    
-#        row=-1
-#        for i,picture in enumerate(pictures):
-#            col=i%IMAGES_PER_ROW
-#            if not col: row+=1
-#            self.tableWidget.addPicture(row, col, pictureDir.absoluteFilePath(picture))    
-#            
-#
-#from sys import argv, exit
-#
-#a=QApplication(argv)
-#m=MainWindow()
-#m.show()
-##m.raise_()
-#exit(a.exec_())
-
-###################################################################
-
-#app = QtGui.QApplication([])
-#widget = QdContactSheet()
-#
-#filenames = []
-#path = '/home/yash/Project/dataset/Pascal VOC 2012/samples'
-#for f in os.listdir(path):              #list all the files in the folder
-#    ext = f.split('.')[1]        #get the file extension
-#    if ext.lower() not in  ["jpg","png","tga", "pgm", "jpeg"]: continue#check if the extension is valid for the image
-#    filenames.append(path+'/'+f )
-#
-#images = filenames# list of images you want to view as thumbnails
-#images.sort()
-#widget.load(images)
-#
-#widget.setWindowTitle("Contact Sheet")
-#widget.resize(1000, 800)
-#widget.show()
-#exit(app.exec_())
