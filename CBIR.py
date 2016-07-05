@@ -16,6 +16,7 @@ from PyQt4.QtGui import QGraphicsScene, QFileDialog, QPixmap
 from heapq import nsmallest
 import pickle
 import cv2
+import numpy as np
 
 Ui_MainWindow, QMainWindow = loadUiType('CBIR_gui.ui')
 
@@ -44,7 +45,7 @@ class CBIR(QMainWindow, Ui_MainWindow):
     thumbnail_size = 256
     spacing = 40
     images_per_row = 2 
-    cached_db = []
+    cached_db = {}
     cached_db_path = ''
     
     def __init__(self, ):
@@ -52,13 +53,13 @@ class CBIR(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setupUi_custom()
         
-        path = '/home/yash/Project/dataset/Pascal VOC 2012/samples'
-        pictures = []
-        for f in os.listdir(path):              #list all the files in the folder
-            ext = f.split('.')[1]        #get the file extension
-            if ext.lower() not in self.valid_images: continue#check if the extension is valid for the image
-            pictures.append(path+'/'+f )
-        self.show_similar(pictures)
+#        path = '/home/yash/Project/dataset/Pascal VOC 2012/samples'
+#        pictures = []
+#        for f in os.listdir(path):              #list all the files in the folder
+#            ext = f.split('.')[1]        #get the file extension
+#            if ext.lower() not in self.valid_images: continue#check if the extension is valid for the image
+#            pictures.append(path+'/'+f )
+#        self.show_similar(pictures)
    
     def setupUi_custom(self,):    
         self.scene = QGraphicsScene()
@@ -82,7 +83,7 @@ class CBIR(QMainWindow, Ui_MainWindow):
         for i,picture in enumerate(pictures):
             col=i%self.images_per_row
             if not col: row+=1
-            self.tableWidget.setCellWidget(row, col,  ImgWidget(imagePath = picture, size=self.thumbnail_size))            
+            self.tableWidget.setCellWidget(row, col,  ImgWidget(imagePath = self.cached_db[picture][0], size=self.thumbnail_size))            
     
     def find_similar(self, results):
         #do pattern matching on the images in retrieved cached_db
@@ -90,8 +91,7 @@ class CBIR(QMainWindow, Ui_MainWindow):
         #display the top 10 imags on right
         if self.database_path == '':
             print("Database file not selected")
-            self.select_database()
-        
+            self.select_database()        
         
         found = False        
         if self.cached_db_path == self.database_path:
@@ -102,17 +102,24 @@ class CBIR(QMainWindow, Ui_MainWindow):
             self.cached_db_path = self.database_path
             for f in os.listdir(self.database_path):              #list all the files in the folder
                 ext = f.split('.')[1]        #get the file extension
-                if ext.lower() == 'p':      #check for pickled cached_db file
-                    self.cached_db = pickle.load(self.database_path+'/'+f)
+                if ext.lower() == 'db':      #check for pickled cached_db file
+                    self.cached_db = pickle.load(open(self.database_path+'/'+f, 'rb'))
+                    print("Cached database found!")
                     found = True
                     break
         
         if not found:
-            self.cached_db = self.make_db()
-            
-        best_matches = nsmallest(self.topk, self.cached_db.keys(), \
-                                key = lambda e: self.difference(self.cached_db[e], results))
+            self.cached_db = self.make_db(self.database_path)
         
+        if len(self.cached_db.keys()) < self.topk: best_matches = self.cached_db.keys()
+        else:
+            self.not_completely_diff = 0
+            best_matches = nsmallest(self.topk, self.cached_db.keys(), \
+                            key = lambda e: self.difference(self.get_vec(results), self.cached_db[e][1] ))
+        
+        if self.not_completely_diff < self.topk: 
+            best_matches = best_matches[:self.not_completely_diff]
+            
         self.show_similar(best_matches)
     
     def difference(self, g1, g2):
@@ -121,19 +128,40 @@ class CBIR(QMainWindow, Ui_MainWindow):
         #compute cross entropy diff from normalised vectors
         #or
         #using some other function which involves the graph edge weights also
-        print("TODO")
-        return #difference measure
+        
+        if sum(g1*g2) == 0: return 99999
+        alpha = 16        
+        w = [alpha if i==0 else 1 for i in g1 ]
+        diff = np.power(w*(g1 - g2), 2).sum() #Squared error
+        self.not_completely_diff += 1
+        return diff
     
-    
-    def make_db(self):
-        #stor entire image paths
-        #store class vectors
+    def make_db(self, path):
+        #right now storing full paths, just for convenience, can be removed later
         #store the other results also, including the graph edge weights
-        print("Todo")
+        print("caching database..")
+        cached_db = {}
+        for f in os.listdir(path):              #list all the files in the folder
+            ext = f.split('.')[1]        #get the file extension
+            if ext.lower() in self.valid_images:
+                print(f)
+                full_path = path+'/'+f
+                self.tag_image(filename = full_path)
+                #Storage format = {name : [path, vec, full_results]}
+                cached_db[f] = [full_path, self.get_vec(self.classifier.result), self.classifier.result]
+                
+        pickle.dump(cached_db, open(path+'/cache.db', 'wb'))
+        return cached_db
+                
+    def get_vec(self, results):
+        vec = np.zeros(len(self.classifier.classes))
+        for result in results:
+            vec[self.classifier.class2idx[result[0]]] += 1
+        return vec
         
     def select_database(self):
         #Read all the images in the folder
-        path = QFileDialog.getExistingDirectory(None, 'Select a folder:', '/home/yash/Downloads/Pascal VOC 2012', QtGui.QFileDialog.ShowDirsOnly)
+        path = QFileDialog.getExistingDirectory(None, 'Select a folder:', '/home/yash/Project/dataset/Pascal VOC 2012/', QtGui.QFileDialog.ShowDirsOnly)
         self.lineEdit_2.setText(path)   
         self.database_path = path
     
@@ -195,12 +223,12 @@ class CBIR(QMainWindow, Ui_MainWindow):
         self.scene2.clear()
         self.update_categories()
              
-        filename = QFileDialog.getOpenFileName(directory = '/home/yash/Downloads/Pascal VOC 2012/samples')
+        filename = QFileDialog.getOpenFileName(directory = '/home/yash/Project/dataset/Pascal VOC 2012/')
         self.lineEdit.setText(filename)
         
         if filename.split('.')[1] in self.valid_images:
             self.disp_img(filename = filename) 
-            self.show_similar([self.classifier.result])
+            self.find_similar(self.classifier.result)
         else:
             print("Invalid file format")
 

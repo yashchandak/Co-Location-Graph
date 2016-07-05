@@ -40,7 +40,7 @@ class YOLO_TF:
     iou_threshold = 0.5
     num_box = 2
     grid_size = 7
-    classes =  ["Aeroplane", "Bicycle", "Bird", "Boat", "Bottle", "Bus", "Car", "Cat", "Chair", "Cow", "Dining Table", "Dog", "Horse", "Motorbike", "Person", "Potted plant", "Sheep", "Sofa", "Train","Tv"]
+    classes =  ["Aeroplane", "Bicycle", "Bird", "Boat", "Bottle", "Bus", "Car", "Cat", "Chair", "Cow", "Dining Table", "Dog", "Horse", "Motorbike", "Person", "Potted plant", "Sheep", "Sofa", "Train","Tv"]   
     num_class = len(classes)
     counter = 1
     batch = 0
@@ -49,6 +49,7 @@ class YOLO_TF:
     
     def __init__(self,argvs = []):    
         tf.reset_default_graph() #reset graph variables from the canvas (useful for multiple time execution in same Ipython shell), tf.close() doesn't remove graph variables from canvas.
+        self.class2idx = {item:i  for i,item in enumerate(self.classes)}
         self.argv_parser(argvs)         
         self.build_networks(training = False)
         #self.training()
@@ -295,6 +296,7 @@ class YOLO_TF:
             self.counter = 1 #reset counter if individual images are being evaluated
         
         for i in range(len(boxes_filtered)):
+            # format = class - x - y - w - h - confidence - id
             result.append([self.classes[classes_num_filtered[i]],boxes_filtered[i][0],boxes_filtered[i][1],boxes_filtered[i][2],boxes_filtered[i][3],probs_filtered[i], self.counter ])
             self.counter += 1
         return result
@@ -323,12 +325,12 @@ class YOLO_TF:
         
         if self.filewrite_img : 
             if self.disp_console : 
-                print( '    image file writed : ' + self.tofile_img)
+                print( '    image file wrote to : ' + self.tofile_img)
             cv2.imwrite(self.tofile_img,img_cp)            
 
         if self.filewrite_txt : 
             if self.disp_console : 
-                print('    txt file writed : ' + self.tofile_txt)
+                print('    txt file wrote to : ' + self.tofile_txt)
             ftxt.close()
          
         self.tagged_image = img_cp
