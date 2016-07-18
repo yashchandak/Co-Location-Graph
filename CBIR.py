@@ -17,6 +17,7 @@ from heapq import nsmallest
 import pickle
 import cv2
 import numpy as np
+from graph_module import get_edges_with_weights
 
 Ui_MainWindow, QMainWindow = loadUiType('CBIR_gui.ui')
 
@@ -52,14 +53,6 @@ class CBIR(QMainWindow, Ui_MainWindow):
         super(CBIR, self).__init__()        #initialise from the ui designed by Designer App
         self.setupUi(self)
         self.setupUi_custom()
-        
-#        path = '/home/yash/Project/dataset/Pascal VOC 2012/samples'
-#        pictures = []
-#        for f in os.listdir(path):              #list all the files in the folder
-#            ext = f.split('.')[1]        #get the file extension
-#            if ext.lower() not in self.valid_images: continue#check if the extension is valid for the image
-#            pictures.append(path+'/'+f )
-#        self.show_similar(pictures)
    
     def setupUi_custom(self,):    
         self.scene = QGraphicsScene()
@@ -84,44 +77,58 @@ class CBIR(QMainWindow, Ui_MainWindow):
             col=i%self.images_per_row
             if not col: row+=1
             self.tableWidget.setCellWidget(row, col,  ImgWidget(imagePath = self.cached_db[picture][0], size=self.thumbnail_size))            
-    
-    def find_similar(self, results):
-        #do pattern matching on the images in retrieved cached_db
-        #keep top 10
-        #display the top 10 imags on right
+
+    def read_database(self, ext):
+        #Option to select database
         if self.database_path == '':
             print("Database file not selected")
             self.select_database()        
         
         found = False        
-        if self.cached_db_path == self.database_path:
+        if self.cached_db_path == self.database_path and self.cached_db_ext == ext:
             #No need to re-read from cPickle if it's re-run on the same db
             found = True
         
+        #Search for any pre-existing db file
         else:
             self.cached_db_path = self.database_path
-            for f in os.listdir(self.database_path):              #list all the files in the folder
-                ext = f.split('.')[1]        #get the file extension
-                if ext.lower() == 'db':      #check for pickled cached_db file
-                    self.cached_db = pickle.load(open(self.database_path+'/'+f, 'rb'))
+            for file in os.listdir(self.database_path):              #list all the files in the folder
+                ext = file.split('.')[1]        #get the file extension
+                if ext.lower() == ext:      #check for pickled cached_db file
+                    self.cached_db = pickle.load(open(self.database_path+'/'+file, 'rb'))
                     print("Cached database found!")
                     found = True
                     break
-        
+                
+        #Create a new db if no exiting db is found
         if not found:
-            self.cached_db = self.make_db(self.database_path)
+            if ext == 'db_vec': self.cached_db = self.make_db_vectorised(self.database_path)
+            else: self.cached_db = self.make_db(self.database_path)
+
+    def make_db_vectorised(self, path):
+        #right now storing full paths, just for convenience, can be removed later
+        #store the other results also, including the graph edge weights
+        print("caching database..")
         
-        if len(self.cached_db.keys()) < self.topk: best_matches = self.cached_db.keys()
-        else:
-            self.not_completely_diff = 0
-            best_matches = nsmallest(self.topk, self.cached_db.keys(), \
-                            key = lambda e: self.difference(self.get_vec(results), self.cached_db[e][1] ))
+        cached_db = {}             
+        for file in os.listdir(path):              #list all the fileiles in the folder
+            ext = file.split('.')[1]        #get the file extension
+            if ext.lower() in self.valid_images:
+                print(file)
+                full_path = path+'/'+file
+                self.tag_image(filename = full_path)
+                #Storage format = {name : [path, vec, full_results]}
+                cached_db[file] = [full_path, self.get_vec(self.classifier.result), self.classifier.result]
+                
+        pickle.dump(cached_db, open(path+'/cache.db_vec', 'wb'))
+        return cached_db
+
+    def get_vec(self, results):
+        vec = np.zeros(len(self.classifier.classes))
+        for result in results:
+            vec[self.classifier.class2idx[result[0]]] += 1
+        return vec
         
-        if self.not_completely_diff < self.topk: 
-            best_matches = best_matches[:self.not_completely_diff]
-            
-        self.show_similar(best_matches)
-    
     def difference(self, g1, g2):
         #compute weighted sum of square diff
         #or
@@ -135,30 +142,75 @@ class CBIR(QMainWindow, Ui_MainWindow):
         diff = np.power(w*(g1 - g2), 2).sum() #Squared error
         self.not_completely_diff += 1
         return diff
+            
+    def find_similar_using_vector(self, results):
+        #do pattern matching on the images in retrieved cached_db
+        #keep top 10
+        #display the top 10 images on right
+        self.read_database(ext = 'db_vec')
+        
+        #check if database atleast has more images than k.
+        if len(self.cached_db.keys()) < self.topk: best_matches = self.cached_db.keys()
+        else:
+            self.not_completely_diff = 0
+            best_matches = nsmallest(self.topk, self.cached_db.keys(), \
+                            key = lambda e: self.difference(self.get_vec(results), self.cached_db[e][1] ))
+        
+        if self.not_completely_diff < self.topk: 
+            best_matches = best_matches[:self.not_completely_diff]
+            
+        self.show_similar(best_matches)
+    
     
     def make_db(self, path):
-        #right now storing full paths, just for convenience, can be removed later
-        #store the other results also, including the graph edge weights
         print("caching database..")
-        cached_db = {}
-        for f in os.listdir(path):              #list all the files in the folder
-            ext = f.split('.')[1]        #get the file extension
+        classes =  ["Aeroplane", "Bicycle", "Bird", "Boat", "Bottle", "Bus", "Car", "Cat", "Chair", "Cow", "Dining Table", "Dog", "Horse", "Motorbike", "Person", "Potted plant", "Sheep", "Sofa", "Train","Tv"]   
+        tag2idx = {}
+        counter = 0
+        idx2tag = []
+        data = {}
+        for i in range(len(classes)):
+            for j in range(i, len(classes)):
+                tag2idx[classes[i]+classes[j]] = counter
+                counter += 1
+                idx2tag.append(classes[i]+classes[j])
+                data[classes[i]+classes[j]] = []
+                
+        cached_db = {'dir': path, 'tag2idx': tag2idx,'idx2tag': idx2tag, 'data': data}
+                     
+        for file in os.listdir(path):              #list all the fileiles in the folder
+            ext = file.split('.')[1]        #get the file extension
             if ext.lower() in self.valid_images:
-                print(f)
-                full_path = path+'/'+f
+                print(file)
+                full_path = path+'/'+file
                 self.tag_image(filename = full_path)
+                
+                for edge, weight in get_edges_with_weights(self.classifier.result):
+                    cached_db['data'][edge].append((file, weight))
                 #Storage format = {name : [path, vec, full_results]}
-                cached_db[f] = [full_path, self.get_vec(self.classifier.result), self.classifier.result]
+                #cached_db[f] = [full_path, self.get_vec(self.classifier.result), self.classifier.result]
                 
         pickle.dump(cached_db, open(path+'/cache.db', 'wb'))
         return cached_db
-                
-    def get_vec(self, results):
-        vec = np.zeros(len(self.classifier.classes))
-        for result in results:
-            vec[self.classifier.class2idx[result[0]]] += 1
-        return vec
         
+    def find_similar(self, results):
+        #do pattern matching on the images in retrieved cached_db
+        #keep top 10
+        #display the top 10 images on right
+        self.read_database(ext = 'db')
+        
+        #check if database atleast has more images than k.
+        if len(self.cached_db.keys()) < self.topk: best_matches = self.cached_db.keys()
+        else:
+            self.not_completely_diff = 0
+            best_matches = nsmallest(self.topk, self.cached_db.keys(), \
+                            key = lambda e: self.difference(self.get_vec(results), self.cached_db[e][1] ))
+        
+        if self.not_completely_diff < self.topk: 
+            best_matches = best_matches[:self.not_completely_diff]
+            
+        self.show_similar(best_matches)
+
     def select_database(self):
         #Read all the images in the folder
         path = QFileDialog.getExistingDirectory(None, 'Select a folder:', '/home/yash/Project/dataset/Pascal VOC 2012/', QtGui.QFileDialog.ShowDirsOnly)
@@ -229,6 +281,7 @@ class CBIR(QMainWindow, Ui_MainWindow):
         if filename.split('.')[1] in self.valid_images:
             self.disp_img(filename = filename) 
             self.find_similar(self.classifier.result)
+            #self.find_similar_using_vector(self.classifier.result)
         else:
             print("Invalid file format")
 
