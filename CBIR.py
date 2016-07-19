@@ -13,7 +13,7 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.uic import loadUiType
 from PyQt4.QtGui import QGraphicsScene, QFileDialog, QPixmap
 
-from heapq import nsmallest
+from heapq import nsmallest, nlargest
 import pickle
 import cv2
 import numpy as np
@@ -65,7 +65,7 @@ class CBIR(QMainWindow, Ui_MainWindow):
         self.scene.addPixmap(QPixmap(os.getcwd()+"/demo.jpg").scaled(self.graphicsView.size(), QtCore.Qt.KeepAspectRatio))
         self.graphicsView.setScene(self.scene)  
         
-    def show_similar(self, pictures):
+    def show_similar(self, pictures, base_dir=''):
         self.tableWidget.setMinimumWidth((self.thumbnail_size+self.spacing)*self.images_per_row+(self.spacing*2))
         
         rowCount=len(pictures)//self.images_per_row
@@ -76,7 +76,8 @@ class CBIR(QMainWindow, Ui_MainWindow):
         for i,picture in enumerate(pictures):
             col=i%self.images_per_row
             if not col: row+=1
-            self.tableWidget.setCellWidget(row, col,  ImgWidget(imagePath = self.cached_db[picture][0], size=self.thumbnail_size))            
+            #self.tableWidget.setCellWidget(row, col,  ImgWidget(imagePath = self.cached_db[picture][0], size=self.thumbnail_size))            
+            self.tableWidget.setCellWidget(row, col,  ImgWidget(imagePath = base_dir+'/'+picture, size=self.thumbnail_size))            
 
     def read_database(self, ext):
         #Option to select database
@@ -92,9 +93,10 @@ class CBIR(QMainWindow, Ui_MainWindow):
         #Search for any pre-existing db file
         else:
             self.cached_db_path = self.database_path
+            self.cached_db_ext = ext
             for file in os.listdir(self.database_path):              #list all the files in the folder
-                ext = file.split('.')[1]        #get the file extension
-                if ext.lower() == ext:      #check for pickled cached_db file
+                extension = file.split('.')[1]        #get the file extension
+                if extension.lower() == ext:      #check for pickled cached_db file
                     self.cached_db = pickle.load(open(self.database_path+'/'+file, 'rb'))
                     print("Cached database found!")
                     found = True
@@ -174,9 +176,15 @@ class CBIR(QMainWindow, Ui_MainWindow):
                 tag2idx[classes[i]+classes[j]] = counter
                 counter += 1
                 idx2tag.append(classes[i]+classes[j])
+                #TODO: [IMPROVE] make the edges non-directional!!
                 data[classes[i]+classes[j]] = []
+                data[classes[j]+classes[i]] = [] #workaround solution
                 
+        #Storage format = {dir, tag2idx, idx2tag, data : {edge : [(file1, weight1), .. , (fileN, weightN)]}}        
         cached_db = {'dir': path, 'tag2idx': tag2idx,'idx2tag': idx2tag, 'data': data}
+        print(cached_db)
+        #cached_db['data'] = {classes[i]+classes[j] : [] for i in range(len(classes)) for j in range(i, len(classes))}
+        
                      
         for file in os.listdir(path):              #list all the fileiles in the folder
             ext = file.split('.')[1]        #get the file extension
@@ -187,30 +195,29 @@ class CBIR(QMainWindow, Ui_MainWindow):
                 
                 for edge, weight in get_edges_with_weights(self.classifier.result):
                     cached_db['data'][edge].append((file, weight))
-                #Storage format = {name : [path, vec, full_results]}
-                #cached_db[f] = [full_path, self.get_vec(self.classifier.result), self.classifier.result]
                 
         pickle.dump(cached_db, open(path+'/cache.db', 'wb'))
         return cached_db
         
     def find_similar(self, results):
+        #TODO : [PROBLEM] No penalty accounted for extra/irrelevant objects
         #do pattern matching on the images in retrieved cached_db
-        #keep top 10
-        #display the top 10 images on right
+        #keep top 10 and display on right
         self.read_database(ext = 'db')
-        
-        #check if database atleast has more images than k.
-        if len(self.cached_db.keys()) < self.topk: best_matches = self.cached_db.keys()
-        else:
-            self.not_completely_diff = 0
-            best_matches = nsmallest(self.topk, self.cached_db.keys(), \
-                            key = lambda e: self.difference(self.get_vec(results), self.cached_db[e][1] ))
-        
-        if self.not_completely_diff < self.topk: 
-            best_matches = best_matches[:self.not_completely_diff]
-            
-        self.show_similar(best_matches)
+        edges = get_edges_with_weights(results)
+        files = {}
+        for edge, e_weight in edges:
+            for img, i_weight in self.cached_db['data'][edge]:
+                #cummulatively update the scores of files
+                files[img] = files.get(img, 0) +  self.get_match_score(e_weight, i_weight)        
 
+        best_matches = nlargest(self.topk, files.keys(), key = lambda e: files[e] )            
+        self.show_similar(best_matches, self.cached_db['dir'])
+    
+    def get_match_score(self, w1, w2):
+        #more the difference, the less the score
+        return 1/np.exp(np.abs(w1-w2))
+        
     def select_database(self):
         #Read all the images in the folder
         path = QFileDialog.getExistingDirectory(None, 'Select a folder:', '/home/yash/Project/dataset/Pascal VOC 2012/', QtGui.QFileDialog.ShowDirsOnly)
