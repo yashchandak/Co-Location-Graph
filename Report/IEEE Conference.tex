@@ -170,7 +170,7 @@
 
 % *** MATH PACKAGES ***
 %
-%\usepackage[cmex10]{amsmath}
+\usepackage[cmex10]{amsmath}
 % A popular package from the American Mathematical Society that provides
 % many useful and powerful commands for dealing with mathematics. If using
 % it, be sure to load this package with the cmex10 option to ensure that
@@ -188,7 +188,7 @@
 % http://www.ctan.org/tex-archive/macros/latex/required/amslatex/math/
 
 
-
+\usepackage{amssymb}
 
 
 % *** SPECIALIZED LIST PACKAGES ***
@@ -351,28 +351,23 @@
 %
 % paper title
 % can use linebreaks \\ within to get better formatting as desired
-\title{Bare Demo of IEEEtran.cls for Conferences}
+\title{Entity Co-Location Applications}
 
 
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
-\author{\IEEEauthorblockN{Michael Shell}
-\IEEEauthorblockA{School of Electrical and\\Computer Engineering\\
-Georgia Institute of Technology\\
-Atlanta, Georgia 30332--0250\\
-Email: http://www.michaelshell.org/contact.html}
+\author{\IEEEauthorblockN{Yash Chandak}
+\IEEEauthorblockA{Computer Science and Engineering\\
+Vellore Institute of Technology\\
+Chennai, India - 600127\\
+yash.chandak2013@vit.ac.in}
 \and
-\IEEEauthorblockN{Homer Simpson}
-\IEEEauthorblockA{Twentieth Century Fox\\
-Springfield, USA\\
-Email: homer@thesimpsons.com}
-\and
-\IEEEauthorblockN{James Kirk\\ and Montgomery Scott}
-\IEEEauthorblockA{Starfleet Academy\\
-San Francisco, California 96678-2391\\
-Telephone: (800) 555--1212\\
-Fax: (888) 555--1212}}
+\IEEEauthorblockN{Babiga Birregah}
+\IEEEauthorblockA{LM2S - CNRS Joint Research Unit \\
+University of Technology\\ Troyes, France - 10004\\
+babiga.birregah@utt.fr}
+}
 
 % conference papers do not typically use \thanks and this command
 % is locked out in conference mode. If really needed, such as for
@@ -411,7 +406,9 @@ Fax: (888) 555--1212}}
 
 \begin{abstract}
 %\boldmath
-The abstract goes here.
+We present a methodology to develop novel applications that utilise the current state of the art in deep learning for object detection. Building upong the unified detection and localisation work in YOLO framework, we develop a semantic graph of objects present in any image. We use this graph for visualising the interaction pattern of objects and develop a semantic content based image retrieval system. We provide a proof of concept which can be further extended to automatically find anomalies encoutered during video surveillance tasks or to build recommender systems based on interest profile of users on the social media based on the entities in the images that they share. The code can be found at:
+https://github.com/yashchandak/Co-Location-Graph
+
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -421,9 +418,6 @@ The abstract goes here.
 % math in the abstract anyway.
 
 % no keywords
-
-
-
 
 % For peer review papers, you can put extra information on the cover
 % page as needed:
@@ -438,26 +432,76 @@ The abstract goes here.
 
 
 \section{Introduction}
-% no \IEEEPARstart
-This demo file is intended to serve as a ``starter file''
-for IEEE conference papers produced under \LaTeX\ using
-IEEEtran.cls version 1.7 and later.
-% You must have at least 2 lines in the paragraph with the drop letter
-% (should never be an issue)
-I wish you the best of success.
-
-\hfill mds
- 
-\hfill January 11, 2007
-
-\subsection{Subsection Heading Here}
-Subsection text here.
+Humans have a natural ability to identify the objects from the images at a semantic level in a very robust way: invariant to illumination, pose and other geometric transforms. On identifying these objects, we humans sub-consciously start relating stuff to each other based on their pattern of co-location or co-occurence. This enables us to take a broader view of the subject and respond accordingly when confronted with task such as categorsing a scene in general or identifying pecularities in the way things are associated with each other. It is  a long standing research objective to develop mathematical models that can govern the machines to do the same. Current state of the art in deep learning community have shown significant progress along this line to identify various objects present in the image. In this paper we propose applications that can harness this input from machine learning and can be utilised for various tasks under a same framework. Our primary contributions involve:
+    \begin{enumerate}
+        \item End to End pipeline; from tagging Entities in the image to developing their co-location graph and it's usage in vairous applications.
+     
+        \item Building Entity co-location graphs in a scalable Map-reduce compatible technique such that it can be scaled efficiently.
+        \item Graphical visualisation of entity co-location pattern.
+        \item Analysing video stream for user given co-occurence pattern
+        \item Semantic content based image retrieval system using the extracted entity information.
+    \end{enumerate}
 
 
-\subsubsection{Subsubsection Heading Here}
-Subsubsection text here.
+\section{Related Works}
 
 
+\section{Methods}
+Our proposed system can bebroadly divided in 3 parts: 
+    \begin{enumerate}
+            \item The Entity tagger
+            \item Extracting co-location graph
+            \item Building the cached database for CBIR or Pattern based video stream analysis, depending on the use case. 
+    \end{enumerate}
+    
+    \subsection{The Entity Tagger}
+        This section is completely independent of the pipeline and can be replaced with any state of the art object detection technique to keep the final results of the application updated. For the current system we have used the YOLO detector because of it's speed and unified detection and localisation abilities. \\ \\
+        The network design of it's framework is inspired by the GoogLeNet model for image classification. It is first pre-trained on the ImageNet and then then the entire model with additional four convolutional layers on top is fine tuned by training it on the PASCAL VOC 2012 dataset which consists of 20 entity categories. It divides the entire image in S*S grid and predicts B bounding boxes for each section. Each bounding box contains 5 items: x,y, width, height and IoU conficence. The centre co-ordinates(x,y) are normalised in the range of 0-1 relative to the section, whereas the width and height are normalised in the range of 0-1 relative to the width and height of the input image. It also predicts the class probablities for C classes in each section. This enables it to predict the classes of the objects and their respective locations in the image simultaneously.
+        \ref{YOLO architecture} shows the entire architecture of the Neural Network used by YOLO.
+        The final tensor output of the network is of size: 
+        \begin{equation}
+            S * S * ( B * 5 + C )
+        \end{equation}
+        For evaluating YOLO on PASCAL VOC, the values used were S = 7, B = 2. PASCAL VOC has 20 labelled classes so C = 20. Final prediction is a 7x7x30 tensor. To keep the model stable during training phase of reducing the sum-squared error, variables 
+        $ \lambda _{coord} = 5,  \lambda_{noobj} = 0.5 $
+        are introduced to avoid low confidence boxes from overpowering the gradient. Since slight error in large boxes are less critical than slight error in smaller ones, squared root of width and height are predicted to partially overcome this problem. The network is trained to optimize the following multi-part loss function: \\
+        $
+        
+        \lambda _{coord} \sum _{i=0}^{S^2} \sum _{j=0}^{B} \mathbb{1}_{ij}^{obj}(x_{i} - \hat x_{i})^{2} + (y_{i} - \hat y_{i})^{2} \\
+        
+        +  \lambda _{coord} \sum _{i=0}^{S^2} \sum _{j=0}^{B} \mathbb{1}_{ij}^{obj} (\sqrt{ w_{i}} - \sqrt{\hat w_{i}})^{2} + (\sqrt{h_{i}} - \sqrt{\hat y_{i}})^{2} \\
+        
+        +  \sum _{i=0}^{S^2} \sum _{j=0}^{B} \mathbb{1}_{ij}^{obj}(C_{i} - \hat C_{i})^{2} \\
+        
+        +  \lambda _{noobj} \sum _{i=0}^{S^2} \sum _{j=0}^{B} \mathbb{1}_{ij}^{obj}(C_{i} - \hat C_{i})^{2} \\
+        
+        +  \sum_{i=0}^{S^2} \mathbb{1}_{i}^{obj} \sum _{c \in classes} (p_{i}(c) - \hat p_{i}(c))^{2}
+  
+        $
+        
+       where $ \mathbb{1}^{obj}_{i} $ denotes if object appears in cell i and $ \mathbb{1}_{ij} $ de-
+        notes that the jth bounding box predictor in cell i is “re-sponsible” for that prediction
+        
+        
+        
+    \subsection{Extracting co-location graph}
+        
+    All the entities in the image are represented as individual nodes on the graph
+    
+    \subsection{Building cached database for CBIR}
+    
+    \subsection{Video stream analysis}
+
+
+\section{Results}
+
+
+\section{Limitations}
+    \begin{itemize}
+        \item Since the images used in the pipeline are 2D and have no depth information, it is not possible to compute the actual distance between any two entities accurately.
+    \end{itemize}
+
+\section{Future Works}
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
 % For figures, \caption should occur after the \includegraphics.
