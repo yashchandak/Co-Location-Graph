@@ -334,7 +334,8 @@
 % \url{my_url_here}.
 
 
-
+\usepackage{graphicx}
+\graphicspath{{images/}}
 
 
 % *** Do not adjust lengths that control margins, column widths, etc. ***
@@ -479,7 +480,14 @@ Our proposed system can bebroadly divided in 5 parts:
        where $ \mathbb{1}^{obj}_{i} $ denotes if object appears in cell i and $ \mathbb{1}_{ij} $ de-
         notes that the jth bounding box predictor in cell $i$ is “responsible” for that prediction. Thus 98 spatially diverse boxes are proposed anf filtered based on the confidence threshold. Further, non maximal supression is applied to remove the redundant boxes and leverage the accuracy. Final result is an array of objects containing the predicted entities and their respective locations in the image.
         
-        
+
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{YOLO}
+  \caption{YOLO neural network architecture.}
+  \label{fig:YOLO}
+\end{figure}
+
     \subsection{Extracting co-location graph}
         
     All the entities in the image are represented as individual nodes on the graph with a unique identity tag. They all share an weighted edge with each other such that value of the edge represent the perceived distance between the entities. It needs to be noted here that since 2 dimensional images themselves have no information about depth, it is practically not possible to accurately identify the actual distance. We use a crude approximation that works well for general images but is susceptible to wrong measurement in case of images that have optical illusion. We pre-assign a relative size value to each entity which our classifier can detect, assuming they all are at the same depth, then we use the following model to estimate the distnce: <Insert equation>. The graphs can then be exported to common formats to maintian cross-compatibility and to have a richer visualisation through other popular frameworks such as : \ref{other graph visualisation tools}
