@@ -1,77 +1,11 @@
 
-%% bare_conf.tex
-%% V1.3
-%% 2007/01/11
-%% by Michael Shell
-%% See:
-%% http://www.michaelshell.org/
-%% for current contact information.
-%%
-%% This is a skeleton file demonstrating the use of IEEEtran.cls
-%% (requires IEEEtran.cls version 1.7 or later) with an IEEE conference paper.
-%%
-%% Support sites:
-%% http://www.michaelshell.org/tex/ieeetran/
-%% http://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/
-%% and
-%% http://www.ieee.org/
 
-%%*************************************************************************
-%% Legal Notice:
-%% This code is offered as-is without any warranty either expressed or
-%% implied; without even the implied warranty of MERCHANTABILITY or
-%% FITNESS FOR A PARTICULAR PURPOSE! 
-%% User assumes all risk.
-%% In no event shall IEEE or any contributor to this code be liable for
-%% any damages or losses, including, but not limited to, incidental,
-%% consequential, or any other damages, resulting from the use or misuse
-%% of any information contained here.
-%%
-%% All comments are the opinions of their respective authors and are not
-%% necessarily endorsed by the IEEE.
-%%
-%% This work is distributed under the LaTeX Project Public License (LPPL)
-%% ( http://www.latex-project.org/ ) version 1.3, and may be freely used,
-%% distributed and modified. A copy of the LPPL, version 1.3, is included
-%% in the base LaTeX documentation of all distributions of LaTeX released
-%% 2003/12/01 or later.
-%% Retain all contribution notices and credits.
-%% ** Modified files should be clearly indicated as such, including  **
-%% ** renaming them and changing author support contact information. **
-%%
-%% File list of work: IEEEtran.cls, IEEEtran_HOWTO.pdf, bare_adv.tex,
-%%                    bare_conf.tex, bare_jrnl.tex, bare_jrnl_compsoc.tex
-%%*************************************************************************
-
-% *** Authors should verify (and, if needed, correct) their LaTeX system  ***
-% *** with the testflow diagnostic prior to trusting their LaTeX platform ***
-% *** with production work. IEEE's font choices can trigger bugs that do  ***
-% *** not appear when using other class files.                            ***
-% The testflow support page is at:
-% http://www.michaelshell.org/tex/testflow/
-
-
-
-% Note that the a4paper option is mainly intended so that authors in
-% countries using A4 can easily print to A4 and see how their papers will
-% look in print - the typesetting of the document will not typically be
-% affected with changes in paper size (but the bottom and side margins will).
-% Use the testflow package mentioned above to verify correct handling of
-% both paper sizes by the user's LaTeX system.
-%
-% Also note that the "draftcls" or "draftclsnofoot", not "draft", option
-% should be used if it is desired that the figures are to be displayed in
-% draft mode.
-%
 \documentclass[conference]{IEEEtran}
 % Add the compsoc option for Computer Society conferences.
 %
 % If IEEEtran.cls has not been installed into the LaTeX system files,
 % manually specify the path to it like:
 % \documentclass[conference]{../sty/IEEEtran}
-
-
-
 
 
 % Some very useful LaTeX packages include:
@@ -97,10 +31,6 @@
 % have to be run twice to clear warning/error messages.
 
 
-
-
-
-
 % *** CITATION PACKAGES ***
 %
 %\usepackage{cite}
@@ -118,9 +48,6 @@
 % The latest version can be obtained at:
 % http://www.ctan.org/tex-archive/macros/latex/contrib/cite/
 % The documentation is contained in the cite.sty file itself.
-
-
-
 
 
 
@@ -163,9 +90,6 @@
 %
 % You can find documentation about the pdfTeX application at:
 % http://www.tug.org/applications/pdftex
-
-
-
 
 
 % *** MATH PACKAGES ***
@@ -211,8 +135,6 @@
 % http://www.ctan.org/tex-archive/macros/latex/contrib/algorithmicx/
 
 
-
-
 % *** ALIGNMENT PACKAGES ***
 %
 %\usepackage{array}
@@ -240,15 +162,11 @@
 % generate multiline equations as well as matrices, tables, etc., of high
 % quality.
 
-
 %\usepackage{eqparbox}
 % Also of notable interest is Scott Pakin's eqparbox package for creating
 % (automatically sized) equal width boxes - aka "natural width parboxes".
 % Available at:
 % http://www.ctan.org/tex-archive/macros/latex/contrib/eqparbox/
-
-
-
 
 
 % *** SUBFIGURE PACKAGES ***
@@ -261,7 +179,6 @@
 % be obtained at:
 % http://www.ctan.org/tex-archive/obsolete/macros/latex/contrib/subfigure/
 % subfigure.sty has been superceeded by subfig.sty.
-
 
 
 %\usepackage[caption=false]{caption}
@@ -282,9 +199,6 @@
 % The latest version and documentation of caption.sty can be obtained at:
 % http://www.ctan.org/tex-archive/macros/latex/contrib/caption/
 
-
-
-
 % *** FLOAT PACKAGES ***
 %
 %\usepackage{fixltx2e}
@@ -296,8 +210,6 @@
 % single column figure to be placed prior to an earlier double column
 % figure. The latest version and documentation can be found at:
 % http://www.ctan.org/tex-archive/macros/latex/base/
-
-
 
 %\usepackage{stfloats}
 % stfloats.sty was written by Sigitas Tolusis. This package gives LaTeX2e
@@ -318,10 +230,6 @@
 % that authors should try to avoid such use. Do not be tempted to use the
 % cuted.sty or midfloat.sty packages (also by Sigitas Tolusis) as IEEE does
 % not format its papers in such ways.
-
-
-
-
 
 % *** PDF, URL AND HYPERLINK PACKAGES ***
 %
@@ -368,36 +276,6 @@ University of Technology\\ Troyes, France - 10004\\
 babiga.birregah@utt.fr}
 }
 
-% conference papers do not typically use \thanks and this command
-% is locked out in conference mode. If really needed, such as for
-% the acknowledgment of grants, issue a \IEEEoverridecommandlockouts
-% after \documentclass
-
-% for over three affiliations, or if they all won't fit within the width
-% of the page, use this alternative format:
-% 
-%\author{\IEEEauthorblockN{Michael Shell\IEEEauthorrefmark{1},
-%Homer Simpson\IEEEauthorrefmark{2},
-%James Kirk\IEEEauthorrefmark{3}, 
-%Montgomery Scott\IEEEauthorrefmark{3} and
-%Eldon Tyrell\IEEEauthorrefmark{4}}
-%\IEEEauthorblockA{\IEEEauthorrefmark{1}School of Electrical and Computer Engineering\\
-%Georgia Institute of Technology,
-%Atlanta, Georgia 30332--0250\\ Email: see http://www.michaelshell.org/contact.html}
-%\IEEEauthorblockA{\IEEEauthorrefmark{2}Twentieth Century Fox, Springfield, USA\\
-%Email: homer@thesimpsons.com}
-%\IEEEauthorblockA{\IEEEauthorrefmark{3}Starfleet Academy, San Francisco, California 96678-2391\\
-%Telephone: (800) 555--1212, Fax: (888) 555--1212}
-%\IEEEauthorblockA{\IEEEauthorrefmark{4}Tyrell Inc., 123 Replicant Street, Los Angeles, California 90210--4321}}
-
-
-
-
-% use for special paper notices
-%\IEEEspecialpapernotice{(Invited Paper)}
-
-
-
 
 % make the title area
 \maketitle
@@ -406,7 +284,7 @@ babiga.birregah@utt.fr}
 \begin{abstract}
 %\boldmath
 We present a methodology to develop novel applications that harness the current state of the art in deep learning for object detection. Building upong the YOLO framework, we obtain unified results for detection and localisation of entities in real-time scenario. We add a layer of abstraction on top of the images that represents it as a semantic graph of object entities in the image. This layer of abstraction helps in analysis of image contents in a more robust and tranform invariant way.  We use this graph for visualising the interaction pattern of objects and develop a semantic content based image retrieval system. This work presents a proof of concept which can be further extended to automatically find anomalies encoutered during video surveillance tasks or to build recommender systems based on interest profile of users on the social media based on the entities in the images that they share. The code can be found at:
-https://github.com/yashchandak/Co-Location-Graph
+https://github.com/yashchandak/Co-Location-Graph 
 
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
@@ -417,6 +295,8 @@ https://github.com/yashchandak/Co-Location-Graph
 % math in the abstract anyway.
 
 % no keywords
+\\ \\
+\textbf{Keywords: co-location, co-occurence, semantic graph matching}
 
 % For peer review papers, you can put extra information on the cover
 % page as needed:
@@ -428,7 +308,7 @@ https://github.com/yashchandak/Co-Location-Graph
 % creates the second title. It will be ignored for other modes.
 \IEEEpeerreviewmaketitle
 
-\section{Keywords}
+
 
 \section{Introduction}
 Humans have a natural ability to identify the objects from the images at a semantic level in a very robust way: invariant to illumination, pose and other geometric transforms. On identifying these objects, we humans sub-consciously start relating stuff to each other based on their interaction pattern. This pattern can either be in sense of co-location, where we start relating items in terms of how often we see them together or in a slightly different way of co-occurence, which relates them on basis of occurence under a perceived time interval. Thus enabling us to take a broader view of the subject and respond accordingly when confronted with task such as categorsing a scene in general or identifying pecularities in the way things are proceeding. It is  a long standing research objective to develop mathematical models that can govern the machines to do the same automatically. Current state of the art in deep learning community have shown significant progress along this line to identify various objects present in the image. In this paper, we propose real purpose applications that can harness this input from machine learning and can be utilised for various tasks under a common, unified framework. Our primary contributions involve:
@@ -440,6 +320,11 @@ Humans have a natural ability to identify the objects from the images at a seman
         \item Semantic content based image retrieval system using the extracted entity relations.
     \end{enumerate}
 
+\begin{figure}
+  \includegraphics[width=\linewidth]{Co-Loc-Diagram}
+  \caption{A semantic entity co-location graph is first built from the query image (on left). It is then compared for similarity with the graph abstractions of other images (on right). The images on right are arranged based on their relative similarity score, top one being the most similar. For pictorial depiction, colors of the nodes indicate the class an entity belongs to. Here, blue: person, red:bike, yellow:table, purple:TV/computer   }
+  \label{fig:C0-Loc-Diagram}
+\end{figure}
 
 \section{Related Works}
 
