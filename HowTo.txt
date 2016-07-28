@@ -1,0 +1,335 @@
+I am seriously interested in Chemistry from the time when I was a schoolboy. Not satisfied with standard school program, in the last 2 years of high school I studied in Moscow Chemical High School which had a strong science and mathematics training. This greatly developed my skills and helped me to win three School Chemistry Olympiads.
+
+After graduation school I entered the Mendeleev University of Chemical Technology � one of the best educational institutions for Chemistry in Russia. By March 2003, I will complete 5 1/2 years of undergraduate studies and receive a University Diploma. In our Physical Chemistry Department students are required not only to take undergraduate courses, including chemical engineering, but also to carry out research in one of the major research centers in Moscow or at the University.
+
+I intend to continue my research work in chemistry. The main goal of my future education is to gain valuable research experience and deepen my knowledge of chemistry. I have chosen Florida State University because it provides excellent opportunities to pursue research in various areas of chemistry.
+
+Since 1999 I have been doing research work at the Division of Chemistry and Technology of Crystals of the University. My research for the most part is related to areas of Physical Chemistry such as Solid State Chemistry, Crystal Growth, Surface Chemistry and others. My first project was synthesis and determination of thermometric parameters of luminophors based on Zinc Sulfide doped with Bismuth. I synthesized and analyzed 19 luminophors with different additives such as Eu, CdS, LiCl and others. As a result of this work, I presented a paper entitled �Non-traditional application of luminophors� at the General Chemistry Institute of the Russian Academy of Sciences student conference in 2001.
+
+In Fall 2001, I switched to research in the field of crystal growth. My second project concerned the single-crystal growth of Calcium and Barium Tungstates (CaWO4, BaWO4). This work I accomplished at the General Physics Institute of the Russian Academy of Sciences. I grew these crystals by flux growth (Czochralski technique). Such single-crystals are important as nonlinear solid-state components for lasers of stimulated scattering.
+
+In addition, I have done work on deposition of thin films. This interesting laboratory practice was lasting during the one of my favorite elective courses �Technology of Heterostructures�. The subject of my research was physical and chemical thin film deposition of Lead Tellurium (PbTe) and Gallium Arsenide (GaAs) from gas phase, thus I have gained practical experience in deposition of thin films of A3B5 and A2B6 heterostructures in vacuum on silicon substrate. Such films are used in the electronic industry as semiconductor layers.
+
+In Spring 2002, I began a project that set the basis for my graduation paper. This research deals with the powder and nanoparticles of Aluminium Oxide (Al2O3) which I analyze by adsorbtion measurements and Monte Carlo simulation. I determine the pore size distribution of the materials based on the compound that is essential for creation of non-organic filters.
+
+Moreover, during the 2001/2002 academic year, I had an important experience as an instructor for freshmen at the General and Inorganic Chemistry Laboratory. Also, I often help foreign students to learn the Russian language. I should say that I enjoy teaching.
+
+During my study I dealt with different research projects and I have various research interests, but the major area in which I would like to specialize, if I will be accepted at your graduate school, is Physical or Theoretical Chemistry. I hope that my research work (including research program) will be beneficial for the University and myself. I am very interested in doing research work at Florida State University.
+
+
+
+
+
+
+As the science of theoretical chemistry has matured, its focus has shifted from analytically solvable problems, such as the atomic structure of hydrogen, to more complex problems for which analytical solutions are difficult or impossible to specify. Important questions about the behavior of condensed phases of matter, the electronic structure of heavy atoms and the _in vivo_ conformation of biological macromolecules fall into this class. The powerful, highly-parallel supercomputers that have evolved from recent advances in computing technology are ideally suited to the mathematical modeling of these complex chemical phenomena. Simulations in which the trajectories of a large number of interacting bodies must be computed simultaneously, such as statistical-mechanical Monte Carlo studies or molecular dynamics simulations, are particularly appropriate for implementation on parallel machines. I plan to devote my graduate and postgraduate work to the theoretical study and computational modeling of these many-body systems.
+
+In preparation for this work, I have developed a strong background in mathematics and computer science in addition to my coursework in chemistry. Given the current demand for increased computing capacity, this background should prove beneficial. For example, while recent advances in computer hardware alone promise potential tenfold increases in speed, truly significant jumps in computing power (speedups of, say, a thousand fold) will require changes in currently available programming environments and the reformulation of popular simulation algorithms. Furthermore, until highly-parallel machines become widely available, even modest increases in capacity will depend in part upon the innovative use of existing hardware through the continued modification of available software and the development of new algorithms. My elective work in computer science and mathematics should prove useful for both the revision of existing programs and the eventual development of new programs and languages specifically designed for the parallel architecture of tomorrow's supercomputers.
+
+After completing my doctoral work, I plan to seek employment as a university professor. I believe the rewards of such a position far outweigh the greater monetary compensation available in industry. For example, academic scientists are generally allowed a greater degree of freedom in their choice of research areas. They also benefit from exposure to co-workers who have a broad range of experiences. Finally, the satisfaction I have derived from my undergraduate tutoring and consulting experience has convinced me that I would enjoy a career in teaching.
+
+
+
+
+
+
+
+
+
+
+As we transverse through the realms of imagination and connect with the world of reality, we build personal paradigms, few, which mould our future and stand the test of time. It was one such paradigm that was the reason and conviction behind my decision to opt for CHEMISTRY as my graduate major.
+
+As an applicant for MS CHEMISTRY program at your university, I would like to provide a brief account of my own interests and ambitions in pursuing the graduate study in your esteemed University.
+
+I have been interested in sciences since my childhood. I wondered at the astronomical number of compounds that carbon forms, which inspired me to choose Chemistry as my major field of study in my Master of Science. As a part of this interest only I choose to study Pharmacy at undergraduate level.
+
+EDUCATION:
+
+I would like to present my past performances as my credentials for success in future endeavors. My academic performance was good & this acted as a booster &made me look at future with confidence & excitement. My schooling provided me with the much needed information for a scientific approach in life. I learned that just having interest is not sufficient & that it needs to be supplemented with hardwork & determination to succeed. I scored 91.6% in the 10th grade. This result filled me withmore confidence & left me with a predilection for academics. Then came the phase
+of pre-university examination(10+2) in which i secured 94.5%. It was this fascination & years of hard work resulted in my selection in engineering and medicine common entrance test ( EAMCET ) in which I was ranked among the top 3% of one lakh candidates which fetched me an admission into the University College Of Pharmaceutical Science, Kakatiya university, Warangal. It is one of the best pharmacycollege in our state with excellent faculty & competitive environment.
+
+An exhilarating career in the field of chemistry has always been my dream. This dream led me to choose Pharmaceutical Sciences as undergraduate course. A well-structured and comprehensive course curriculum at University College Of Pharmaceuticals Sciences, Kakatiya University, has laid a firm foundation in the areas of Organic Chemistry, Inorganic chemistry, Analytical chemistry, Biochemistry, Microbiology, Pharmaceutical Analysis etc. Equipped with a sound knowledge of Organic chemistry, Inorganic chemistry and medicinal chemistry, I am convicted that I am capable of pursuing research in my choosed field.
+
+WHY CHEMISTRY :
+
+Chemistry has gained prominence over these years, as this branch has undergone technical innovations and enrichments. Newer instrumental techniques have undoubtedly added immensely to penetrative chemical estimations. The processes used for the estimation of the compounds require high sophistication and skill. Over the past three years I am introduced to different topics of Chemistry, I have spent good deal of time learning seperative techniques like solvent extraction, ion exchange, chromatography and also I an familiar with the basic principles-spectroscopy ( UV, Visible, IR), Conductometry, Nephelometry, gas analysis. I also did analytical work on organic compounds, i.e. elemental analysis, functional group analysis, and of fats & oils, blood, water as a part of my practical assignments.
+
+TRAINING:
+
+I have undergone Hospital training and have been exposed to different types dosage dispensing methods in “ Dr. Reddy’s Laboratories,” headquartered at Hyderabad”. This training provided me with a pragmatic outlook and the prerequisite attitude and aptitude for research.
+
+CAREER OBJECTIVE:
+
+I belie that the vast application potential and tremendous scope for research in
+the field of chemistry provide me with an invigorating and challenging academic environment. By pursuing graduate study, I wish to move towards my goal of contributing more effectively to the society scientist.
+
+Graduate study, I feel, will provide ample opportunities to involve myself in my
+areas of interest. Experiencing the challenges and rewards of exploring new relationships between ideas and facts, acquiring expertise with tools and methods central to my discipline and there by honing my creative insights and abilities are some of the expectations in my mind for pursuing graduate study and research work.
+
+As I plan to either work as a research professional or work in an Industry that can allow me to explore and experiment, helping in the development of novel vistas in
+the field of study. I feel that a master’s degree is my next logical step and as I am very much interested in the chromatographic and spectroscopic techniques, Chromatography fascinated me very much during my undergraduate study. I developed profound interest on the subject and had learnt in detail about adsorption chromatography, TLC, HPLC, and Gas Chromatography, fluid partition I think my research should be in the above aspects.
+
+REASONS FOR SELECTING YOUR UNIVERSITY :
+
+On careful study of the college, website and its appropriate superiors advising for it, I have found that the graduate program suits my needs perfectly and active research is in accordance with my interest. Together with its eminent faculty, excellent research facilities, pleasant university ambience and balanced academic program, I feel that your university is the right place to embark upon my graduate study. I am confident that I will live up to the high academic standards of your university supported by your able academic guidance. I believe that enrollment at your university will satiate my thirst for the subject and provide an opportunity to scale the ladder of success, I am sure that working in the highly stimulating atmosphere of your campus will provide me the impetus to strive ceaselessly to attain my cherished goals. Coming to my personality, I assure you that I have necessary commitment, intelligence, maturity and determination to achieve my goals. My strengths are conceptual understanding, self confidence, hardworking and optimism.
+
+Thank you for the opportunity to express my views. I hope that I satisfy the criteria for admission along with a possible financial aid. An assistantship in any encouraging field would give me an in valuable research experience.
+
+Expecting a favorable consideration and looking forward to being associated with you.
+
+ 
+
+
+
+
+Spending my early years in my family’s native Lebanon gave me a sense of history and permanence on this earth that seemed very at odds with the new life we started when my family moved to New Mexico when I was ___ years old. Life in Lebanon is, on the surface, much like it was hundreds of years ago, and if you were to take a picture of our street there and its inhabitants, I have no doubt with the exception of the particulars of people’s faces it would look much the same as a painting from long ago. It seemed at first that nothing in New Mexico was older than 20 or 30 years old, families moved on and off our block regularly, and everything seemed to be in a constant state of flux. This was so unlike what I was used to that it took awhile to get adjusted, but I soon learned, however, to appreciate my new home and see the importance in constantly trying to improve on what has gone before you. My parents moved us to the US in order to further my father’s education and it is with great pride that I now too seek the same opportunity to build a career on solid educational foundation.
+
+My undergraduate career is marked by a solid grade point average and I have every intention of maintaining and indeed improving my performance in graduate school as I will now be able to devote all of my attention to the sole subject of my interest: pharmacology. I knew early on in my studies that this was a subject that I could excel in due to my natural inclination towards the sciences, but it was only through my experience working in a pharmacy that I found I also had the important ability to relate to the patients as well. I am by nature a compassionate person, and I have found that my calm demeanor and patient explanations to customers helps to put them at ease in what can at times be a stressful or intimidating experience.
+
+It is my goal to earn a doctorate in pharmacology and then apply that knowledge in a career as a pharmacist. I am eager to expand my knowledge in this field and hope to take part in future research projects. I have also had the opportunity to volunteer in my local Children’s Hospital and I hope that as I become more experienced my volunteer activities will expand as well since I will be able to offer more expertise to those in need. I look forward to building a solid educational foundation which I hope to constantly improve upon by staying abreast of any improvements in the field, at University.
+
+
+
+
+
+
+My current work with Dr. Raganasik is on the activation of nitrogen-regulated promoters. Earlier
+work in this laboratory has shown that transcription of the glnALG operon of E. coli, coding for
+glutamine synthetase and two nitrogen regulatory proteins, is initiated at glnAp2 by σ -RNA
+polymerase. Under nitrogen-limiting conditions, the regulatory protein NR is phosphorylated by
+NR . NR -phosphate (NR -P) binds to two sites, located 100 and 130 bp upstream from the
+transcription start site, and catalyzes the isomerization of the closed σ -RNA polymerase-
+glnAp2 complex to the open complex. We have now shown that NR -P cannot activate a σ
+promoter, like the lac promoter, containing NIR -binding sites but can activate other σ
+promoters like nifHp. These results suggested that the activation by NR -P is not solely
+dependent on the presence of the NR -binding sites but also on the nucleotide sequence of the
+downstream promoter region. In collaboration with Dr. Vona White, we studied the effect of
+phosphorylation of NR on its DNA binding properties. Our results showed that phosphorylation
+greatly increases cooperative binding of the activator to two adjacent binding sites, and that the
+interaction between two NR -P dimers is required for activation.
+urthermore, I am studying the activation of glnHp2, also a nitrogen-regulated promoter, of
+the glutamine permease operon of E. coli. I have shown that open complex formation at glnHp2
+is activated by NR -P, and that the activation is stimulated by integration host factor (IHF), a
+DNA-bending protein. IHF binds to a site between the NR -binding sites and the promoter. A
+single nucleotide mutation in glnHp2 (T to G at position -14) increases the affinity of σ -RNA
+polymerase for the promoter. Using an in vitro transcription assay, I showed that the stimulation
+by IHF takes place only in promoters that form weak closed complexes with RNA polymerase.
+Activation of the mutant promoter is not stimulated by IHF. On the other hand, when the binding
+sites for NR or IHF were placed on the opposite side of the DNA helix, IHF inhibited the open
+complex formation. We conclude from these results that the stiffening produced by the IHF-
+induced bend can facilitate or prevent interactions between the upstream bound NR -P and the
+closed RNA polymerase-promoter complex, depending on the relative location of the binding
+sites for these proteins. In this manner, a regulatory protein, IHF, can stimulate or block
+transcription without itself contacting either the RNA polymerase or the activator.
+Recently, we have found that σ binds specifically to the glnHp2 promoter in the absence of
+the core RNA polymerase subunits. In collaboration with Weslia Carson and Malcolm Blick
+(AFRC Nitrogen Fixation Laboratory, University of Sussex, England), we have demonstrated a
+new role for core RNA polymerase in transcription: that it assists the binding of σ to promoter
+DNA. An altered form of σ with a deletion within the N terminus showed increased DNA
+binding properties. Our results suggest σ has a latent DNA binding activity that is revealed by
+core RNA polymerase.
+Summary of Previous Research
+As a postdoctoral associate in the laboratory of Dr. Kirschner, I was involved in two research
+projects. One project was to characterize the ams gene, which is involved in decay of
+Escherichia coli mRNA. I cloned the ams gene by complementation, mapped the transcription
+start site, and determined the size and the N terminus sequence of the ams protein. We used a T7
+RNA polymerase-promoter system to overexpress the ams locus. We determined the nucleotide
+sequence of the ams gene, and these data showed that the C terminus of the protein has homology
+to a mitochondrial ribosomal protein of Neurospora crassa. More recently, it has been shown
+that ams encodes RNase E, an endoribonuclease that plays a general role in the chemical decay
+of E. coli mRNA. The other project was the characterization and secretion of protease III (ptr)
+of E. coli. I mapped and sequenced the ptr promoter and determined the N terminus sequence of
+protease III. This N terminus contains a signal sequence that is needed for secretion of protease
+III to the periplasm. Using the cloned ptr gene and protease III-alkaline phosphatase fusions, we
+found evidence that protease III is also secreted to the growth medium.In my PhD work, I studied the chemistry and ultrastructure of the spore wall of Aspergillus
+nidulans conidia, and the effect of cell wall components in the uptake of chemicals. I used
+electron microscopy to study the ultrastructure of the conidial wall and found that it is composed
+of several layers. The outer layer is covered by regularly arranged fibers (rodlets) which can be
+removed by sonication. Chemical analysis of purified conidial walls from a wild-type strain
+showed the presence of neutral sugars (glucose, galactose, and mannose), protein, chitin,
+melanin, and small amounts of lipid. Chemical fractionation experiments showed the presence of
+alpha-1,3-glucan in the electron-dense outer layer. Conidial walls of a white mutant strain
+lacked melanin and alpha-1,3-glucan. I also purified the rodlets, which contain protein and
+melanin in equal amounts and some carbohydrate. Histidine, aspartic acid, glutamic acid,
+glycine, and alanine are the most prominent amino acids of the rodlet protein. The presence of
+melanin and possible cross-linkages between it and amino acids like aspartic acid, glutamic
+acid and glycine makes the rodlets resistant to proteases. I also studied the effect of conidial
+wall components on the uptake of sugar analogs and amino acids by conidia. Conidia were first
+treated with sonication to remove the rodlet layer, and then with proteases or glucanases. The
+removal of glucan and protein from the outer layer of the conidial wall allowed an increased
+uptake of 2-deoxy-D-glucose, 3-O-methyl-glucose and L-alanine. These results indicate that
+certain components of the conidial wall act as a barrier to penetration of chemicals.
+
+
+
+
+
+
+
+From childhood chemistry kits to PCR and cloning, I always knew I had a passion for science,
+but it was an experience while conducting research in a laboratory this last summer that finalized
+my decision to attend graduate school. It was 4 in my Princeton internship laboratory where I
+experienced my biggest Eureka! moment. I had been building on a series of experiments that led
+to that defining moment at the fluorescent microscope. I was extremely meticulous while
+preparing the slides. This was it! I thought. Several weeks of experiments were about to yield a
+conclusive answer. The experiments were designed to determine if there was a direct interaction
+between a RAS protein and the MAPK pathway, and the fluorescent intensities would tell all.
+That morning, not only did I know that the RAS protein did not have direct contact with the
+MAPK pathway as the conventional pathway portrayed, but I knew that I had discovered this
+myself. Yes, Dr. Roberto Nunez had set up this lab and supervised it, and yes three postdocs had
+helped me hone my skills but, in the end, I had discovered the finding—I did the experiments, I
+interpreted the results, and I realized I could advance knowledge in the field of biology.
+Laboratory research has always appeared to match my intellectual interests perfectly; the end
+result of gaining knowledge is captivating. Research epitomizes what I find most enjoyable and
+what I would most like to pursue as a profession.I have been fortunate to have the opportunity to take part in a number of different research
+projects over the last few years. I was first exposed to research my freshman year of college by
+taking on an independent project concerning the extraction of metals from acid mine drainage
+water samples by an Amaranthus plant species under the supervision of Dr. Anne Kondo. The
+following year, I conducted research using the plant pathogenic fungus, Rhizoctonia solani,
+examining viral-like particles (dsRNA) that were unique to disparate isolates of the fungus with
+the goal of creating a biosensor to detect bioagents with Dr. Narayanaswamy Bharathan. The
+summer after my junior year, I participated in the Princeton University’s Summer Undergraduate
+Research Program in Molecular and Quantitative & Computational Biology, working with Dr.
+James Broach, where I requested to work on two separate projects since one project did not
+suffice for the amount of time I wanted to spend in the laboratory. For one of the projects, I
+focused on examining nuclear localization of the transcription factors MSN2 and MSN4 in
+response to sources of stress, such as nutrient deprivation and osmotic irregularities in
+Saccharomyces cerevisiae. For the other project, I tested the conventional method of RAS
+protein’s direct interaction with the MAPK pathway to determine its accuracy. After these
+research experiences, I found that my interests lay in the field of molecular biology, so I began
+my senior biochemistry research project in a laboratory involved in studying circadian and
+ultradian rhythms in Paramecium tetraurelia with Dr. Robert Hinrichsen. My project focuses on
+using RNA interference to determine the function of genes involved in the regulation of calciumflux in the calcium storage unit.
+I am particularly interested in graduate studies in the molecular mechanisms involved in
+embryogenesis and morphogenesis, the development and function of stem cells and chromosomal
+and protein behavior in regard to these biological processes. I find that the types of research
+interests I have are in correspondence with several research faculty members at Yale University,
+including Drs. Valerie Horsley, David Wells, and Weimin Zhong. All of these faculty members
+have research projects that involve the molecular mechanisms of developmental processes. I am
+greatly intrigued by Dr. Horsley’s research in epithelial stem cell proliferation and its
+applications to regeneration, Dr. Well’s research in the biochemistry involved in dendrite
+synaptic plasticity, and Dr. Zhong’s work in studying molecular mechanisms of stem cells that go
+through asymmetrical divisions. Yale University would provide me with a great opportunity
+since its faculty research matches so well with my academic interests.
+(Each essay should read, from first line to last, as if you only wrote the essay for this one application. That establishes fit and
+match. This student does a worthy job of matching her background and interests to the specific program, specific labs, and
+specific faculty members.)
+A future career goal of mine is to work in partnership with developing countries in the
+biosciences to enhance knowledge in the scientific field. As an undergraduate, I have
+consistently studied Chinese language and culture, and have traveled abroad for a language
+intensive program in Chengdu, China, an unusual experience for a lab sciences major. These
+classes have made it possible for me to graduate with both an Asian studies and biochemistry
+bachelor’s degree. Also, for next semester, I have set up an independent study course to learn
+scientific terminology in Chinese. China is a major developing country contributing to the
+sciences, as seen by their development of the Beijing Genomics Institute along with their
+advanced twenty-year bioscience plan for the stem cell and genetic engineering industry. Science
+is a collaborative subject that requires knowledge and resources from what should be an
+international level. I consider myself a useful student not only for the scientific background I can
+bring to Yale University, but also for my proficiency in the Chinese language that I can use to
+enhance international collaborations in science.
+Upon completing the graduate program, I look forward to continuing my education through a
+postdoctoral fellowship, after which I plan to conduct research at an institute of advanced
+studies involved in medical and therapeutic treatments of developmental abnormalities.
+Eventually, I would like to obtain a position in academia to focus on advancing applications to
+stop abnormal differentiation of embryonic stem cells. Along the way, I would also work to
+encourage international collaborative efforts to work on scientific issues in today’s global
+society. The program at Yale University would serve as a vital foundation for obtainingknowledge in my intended field.
+Throughout my experiences as an undergraduate researcher and research assistant, I have
+learned that research is a rewarding process. This direction matches best with my interests,
+skills, and goals. I realize that as a graduate student, I will be expected to spend countless hours
+in the laboratory performing research; however, I also realize that this is my passion. I believe
+my determination and tenacity in the pursuit of knowledge, along with my other qualifications,
+can lead to success as a student in the graduate program at Yale University. It is my goal to
+become highly skilled, and to contribute real value to the projects of the faculty at Yale
+University.
+
+
+
+
+
+
+
+
+
+The training conducted under this grant would be geared toward establishing a new academic
+laboratory in which biological, chemical, and physical techniques are focused on elucidating the
+fundamental forces and principles of bioorganic and bioinorganic catalytic mechanisms. The
+strategy of this laboratory would be to elucidate chemical structure/reactivity properties of
+enzymes and enzyme-bound intermediates leading to the design of experiments that test the nature
+of transition state stabilization for a given reaction. As chemical systems, some proteins provide
+excellent, surprisingly tolerant, structurally definable scaffolds for holding probes of the ground
+states and transition states of catalyzed reactions. Mutant proteins are truly chemical analogues
+of the wild type structure, and genetics provides an excellent way to generate and test a large
+number of these analogues (10/8 structures, which would result from randomizing seven amino
+acid positions, could reasonably be tested genetically). X-ray crystallography and NMR
+spectroscopy provide powerful, essential, yet incomplete characterization of enzyme chemistry.
+Fruitful interpretation of good structures can be limited by a paucity of functional information.
+Therefore, the proposed laboratory would be primarily responsible for generating functional
+information through the preparation of enzymes, random and site-directed mutant enzymes,
+inhibitors, and chemically and isotopically modified substrates and cofactors, and through the
+characterization of the chemical reactions of these reagents. Characterization of the reactions
+would routinely include genetic function, reaction product analysis, kinetics, and at a minimum,
+the preparation of suitable samples for X-ray crystallography, NMR spectroscopy, and any other
+informative techniques. How far the work of the lab extends into the physically oriented
+techniques will be determined by the extent of the training I am able to accomplish as well as by
+personnel in the lab; however, collaborations with specialists in crystallographic or
+spectroscopic techniques will always be preferable to provide as many perspectives on a given
+project as possible. To the extent that good, effective mathematical models are available, they
+will be highly considered during the interpretation of results and tested by the design of
+experiments, e.g., the computer program Del Phi has proven itself a useful model for
+electrostatic forces in proteins. The laboratory would study many different enzymes with
+different chemistries at various stages of development. The study of established enzyme systems
+would provide the most rigorous testing ground for our knowledge of enzymatic chemistry. The
+analysis of enzymes with undefined mechanisms would include therapeutic targets where much
+may be presumed about the chemistry of the enzyme, but where satisfactory, functional inhibitors
+are still wanted. The social raison d’être for this laboratory would be the development of new
+therapeutic inhibitors based upon the chemistry derived from pursing an understanding of
+catalysis. The study of enzymes with unknown mechanisms should provide fertile ground for thediscovery of new chemistry. The proposed postdoctoral work provides an excellent opportunity to establish a project that
+has much in common with the future work of the proposed laboratory. The enzyme is a
+therapeutic target with an unknown mechanism. The project hinges on the synthesis of substrate
+analogues as inhibitors and involves chemical and kinetic characterization of the inhibition,
+aspects of enzymology in which I am not well trained. In addition, chemical characterization may
+involve the preparation and analysis of protein crystals.
+The proposed scientific advisor, Prof. Robert Abeles, has established a laboratory where
+compounds are routinely designed and synthesized with the intent of testing bioorganic and
+bioinorganic enzymatic mechanisms. As a consequence, he provides expertise in an environment
+where the results of such experiments are routinely analyzed and interpreted. He actively seeks
+to train his postdoctoral fellows in science while teaching chemistry as it pertains to the analysis
+of enzyme mechanisms. In short, he operates a laboratory with the focus with which I would like
+to operate my own. His recommendation would indicate my suitability as the director of such a
+laboratory. Brandeis University presents an excellent faculty. In addition to Dr. Abeles, the biochemistry
+faculty includes Dr. W. P. Jencks, who is also a particularly lucid and careful chemist and
+enzymologist. As a sign of the continuing support of penetrating enzymology, the university has
+recently added to the faculty two noted crystallographers, Drs. G. A. Petsko and D. Ringe,
+whose collaboration with Dr. Abeles is very strong. Their crystallographic program now
+includes the Laue diffraction technique which allows structural characterization of enzymatic
+reactions on a millisecond time scale.
+
+
+
+
+
+
+
+My first research project involved determining whether the enzyme Uridylate Synthase
+“channels” the intermediate Orotidine 5’-mono-phosphate. This is a multifunctional enzyme and
+explanations for the evolution of this multifunctionality have been somewhat widespread
+throughout the literature. This project then questioned the basis of these explanations and offered
+new hypotheses as to why such multifunctional proteins have evolved. I wrote the computer
+modeling programs that integrated, through recursion, all of the relevant Michaelis-Menton rate
+equations. This analysis proved that a channeling argument was unnecessary to explain the
+available experimental evidence. I also performed some related enzyme assays in order to check
+several related hypotheses developed by Dr. McClard and myself.Last summer I worked on an organic synthesis project that involved synthesis of one
+interesting analogue of a potent, possibly the most potent, regulator of the gluconeogenesis
+glycolysis pathways fructose 2,5-bisphosphate. The key to the synthesis of the analogue shown
+below is control of the stereochemistry of the previously anomeric carbon. My work was
+involved in the reactions with I and Br and creation of the “halogenonium” ion of the Wittig
+product from the starting protected arabinofructoside sugar, also shown below.My current research project, my senior thesis, is related to the one I was involved in during
+the summer. In this case, I am attempting to synthesize an analogue of
+phosphoribosylpyrophosphate (PRPP), which is the molecule that provides the sugar portion in
+the de novo pathway of pyrimidine biosynthesis. This work utilizes the same synthetic scheme as
+shown above with the exception of starting with the ribose sugar and several changes in thephosphorous portion of the molecule. The synthetic scheme below shows the route I hope to
+exploit in synthesizing the target molecule. These projects were all carried out with Prof.
+McClard at Reed College.
+
+
+

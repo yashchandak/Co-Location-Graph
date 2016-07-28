@@ -11,7 +11,7 @@ import os
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.uic import loadUiType
-from PyQt4.QtGui import QGraphicsScene, QFileDialog, QPixmap
+from PyQt4.QtGui import QGraphicsScene, QFileDialog, QPixmap,  QMessageBox#, QWidget, QPushButton
 
 from heapq import nsmallest, nlargest
 import pickle
@@ -25,15 +25,16 @@ class ImgWidget(QtGui.QLabel):
     ##IMP: IF using QtDesigner to make tables, make sure to set default row, column to non zero values
     ##otherwise it doesn't seem to work [Weird Bug]
     def __init__(self, parent=None, imagePath = '', size = 50):
-        super(ImgWidget, self).__init__(parent)        
-        pic = QtGui.QPixmap(imagePath)
-        if pic.height()>pic.width(): pic=pic.scaledToWidth(size)
+        super(ImgWidget, self).__init__(parent)       
+        pic = QtGui.QPixmap(imagePath)                              #Get the pic from it's path
+        if pic.height()>pic.width(): pic=pic.scaledToWidth(size)    #resize the picture to fit the table cell
         else: pic=pic.scaledToHeight(size)
-        self.setAlignment(QtCore.Qt.AlignCenter)
+        self.setAlignment(QtCore.Qt.AlignCenter)                    #centre align the picture
         self.setPixmap(pic)
 
 
 class CBIR(QMainWindow, Ui_MainWindow):
+    #class variables
     flag = True
     categories = {}
     valid_images = ["jpg","png","tga", "pgm", "jpeg"]
@@ -54,25 +55,92 @@ class CBIR(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setupUi_custom()
    
-    def setupUi_custom(self,):    
+    def setupUi_custom(self,): 
+        self.setWindowTitle('CBIR') 
+        
+        #setup space to display selected image and it's tagged version
         self.scene = QGraphicsScene()
         self.scene2 = QGraphicsScene()
+        
+        #connect the buttons to their respective functions
         self.pushButton.clicked.connect(self.select_image)
         self.pushButton_2.clicked.connect(self.find_similar)
         self.pushButton_3.clicked.connect(self.select_database)
         self.horizontalSlider.valueChanged.connect(self.update_LCD)
+        
         #TODO [WEIRD PROBLEM] QPixmap needs to be called at least once with JPG image before tensorFlow, otherwise program crashes
-        self.scene.addPixmap(QPixmap(os.getcwd()+"/demo.jpg").scaled(self.graphicsView.size(), QtCore.Qt.KeepAspectRatio))
-        self.graphicsView.setScene(self.scene)  
+        self.scene.addPixmap(QPixmap(os.getcwd()+"/images/demo.jpg").scaled(self.graphicsView.size(), QtCore.Qt.KeepAspectRatio))
+        self.graphicsView.setScene(self.scene)          
+        
+        #set-up toolbar items and link them to respective functions
+        Help = QtGui.QAction(QtGui.QIcon('images/info.png'), 'Help', self)
+        Help.triggered.connect(self.show_help)
+        
+        Settings = QtGui.QAction(QtGui.QIcon('images/settings.png'), 'Settings', self)
+        Settings.triggered.connect(self.show_settings)
+        
+        Export = QtGui.QAction(QtGui.QIcon('images/export.png'), 'Export', self)
+        Export.triggered.connect(self.show_export)
+        
+        ##To set up the toolbar
+        self.toolbar = self.addToolBar('Help')
+        self.toolbar.addAction(Help)
+        self.toolbar = self.addToolBar('Settings')
+        self.toolbar.addAction(Settings)
+        self.toolbar = self.addToolBar('Export')
+        self.toolbar.addAction(Export)
+        
+    def show_help(self):
+       msg = QMessageBox()
+       #setup title, main heading, about us info
+       msg.setIcon(QMessageBox.Information) 
+       msg.setWindowTitle("About Us")
+       msg.setText("Semantic Entity graph based Image matching")       
+       msg.setInformativeText("Developed by Yash Chandak, under supervision of Prof. Babiga Birregah, University of Technology, Troyes")
+       
+       #Section for further details on how to use the software
+       f = open('HowTo.txt', 'r')
+       msg.setDetailedText(f.read())
+       
+       #setup return buttons
+       msg.setStandardButtons(QMessageBox.Ok )    	
+       msg.exec_()
+
+    def show_settings(self):
+        framerate, ok = QtGui.QInputDialog.getInt(self, 'Settings', 'Enter Frame Rate for Videos:')
+        self.framerate = framerate
+        
+    def show_export(self):
+        #TODO gephi export
+        name, ok = QtGui.QInputDialog.getText(self, 'Export to Gephi format', 'Enter file name :')
+        self.exportname = name
+
+    def select_database(self):
+        #Read all the images in the folder
+        path = QFileDialog.getExistingDirectory(None, 'Select a folder:', '/home/yash/Project/dataset/Pascal VOC 2012/', QtGui.QFileDialog.ShowDirsOnly)
+        self.lineEdit_2.setText(path)   
+        self.database_path = path
+    
+    def update_categories(self):
+        #update selected categories
+        for radiobox in self.findChildren(QtGui.QRadioButton):
+            self.categories[radiobox.text()] = radiobox.isChecked()
+
+    def update_LCD(self):
+        #update edge_threshold variable based on slider
+        self.edge_threshold = self.horizontalSlider.value()
+        self.lcdNumber.display(self.edge_threshold)  
         
     def show_similar(self, pictures, base_dir=''):
+        #set the table layout spacing
         self.tableWidget.setMinimumWidth((self.thumbnail_size+self.spacing)*self.images_per_row+(self.spacing*2))
-        
+        #set table row and column count based on similar images received
         rowCount=len(pictures)//self.images_per_row
         if len(pictures)%self.images_per_row: rowCount+=1
         self.tableWidget.setRowCount(rowCount)
     
         row=-1
+        #set the pictures in the table cells
         for i,picture in enumerate(pictures):
             col=i%self.images_per_row
             if not col: row+=1
@@ -132,11 +200,6 @@ class CBIR(QMainWindow, Ui_MainWindow):
         return vec
         
     def difference(self, g1, g2):
-        #compute weighted sum of square diff
-        #or
-        #compute cross entropy diff from normalised vectors
-        #or
-        #using some other function which involves the graph edge weights also
         
         if sum(g1*g2) == 0: return 99999
         alpha = 16        
@@ -218,21 +281,7 @@ class CBIR(QMainWindow, Ui_MainWindow):
         #more the difference, the less the score
         return 1/np.exp(np.abs(w1-w2))
         
-    def select_database(self):
-        #Read all the images in the folder
-        path = QFileDialog.getExistingDirectory(None, 'Select a folder:', '/home/yash/Project/dataset/Pascal VOC 2012/', QtGui.QFileDialog.ShowDirsOnly)
-        self.lineEdit_2.setText(path)   
-        self.database_path = path
-    
-    def update_categories(self):
-        #update selected categories
-        for radiobox in self.findChildren(QtGui.QRadioButton):
-            self.categories[radiobox.text()] = radiobox.isChecked()
-
-    def update_LCD(self):
-        #update edge_threshold variable based on slider
-        self.edge_threshold = self.horizontalSlider.value()
-        self.lcdNumber.display(self.edge_threshold)        
+      
         
     def tag_image(self, filename = None, batch = False, image = None ):
         #importing TensorFlow on top causes segmentation fault (official bug #2034)
@@ -280,8 +329,9 @@ class CBIR(QMainWindow, Ui_MainWindow):
         #Clear previous image displays        
         self.scene.clear()
         self.scene2.clear()
-        self.update_categories()
-             
+        self.update_categories() #update categories to incorporate any changes made
+        
+        #Change the file path to any default directory, as per need.             
         filename = QFileDialog.getOpenFileName(directory = '/home/yash/Project/dataset/Pascal VOC 2012/')
         self.lineEdit.setText(filename)
         

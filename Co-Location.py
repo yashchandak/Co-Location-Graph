@@ -39,7 +39,40 @@ class CoLocation(QMainWindow, Ui_MainWindow):
         super(CoLocation, self).__init__()        #initialise from the ui designed by Designer App
         self.setupUi(self)
         self.setupUi_custom()
+        Help = QtGui.QAction(QtGui.QIcon('info.png'), 'Help', self)
+        Help.triggered.connect(self.show_help)
         
+        Settings = QtGui.QAction(QtGui.QIcon('settings.png'), 'Settings', self)
+        Settings.triggered.connect(self.show_settings)
+        
+        Export = QtGui.QAction(QtGui.QIcon('export.png'), 'Export', self)
+        Export.triggered.connect(self.show_export)
+        
+        ##To set up the toolbar
+        self.toolbar = self.addToolBar('Help')
+        self.toolbar.addAction(Help)
+        self.toolbar = self.addToolBar('Settings')
+        self.toolbar.addAction(Settings)
+        self.toolbar = self.addToolBar('Export')
+        self.toolbar.addAction(Export)
+        
+    def show_help(self):
+       msg = QMessageBox()
+       msg.setIcon(QMessageBox.Information)    
+       msg.setText("Semantic Entity graph based Image matching")
+       f = open('HowTo.txt', 'r')
+       msg.setInformativeText("Developed by Yash Chandak, under supervision of Prof. Babiga Birregah, University of Technology, Troyes")
+       msg.setWindowTitle("About Us")
+       msg.setDetailedText(f.read())
+       msg.setStandardButtons(QMessageBox.Ok )    	
+       retval = msg.exec_()
+
+    def show_settings(self):
+        framerate, ok = QtGui.QInputDialog.getInt(self, 'Settings', 'Enter Frame Rate for Videos:')
+        self.framerate = framerate
+        
+    def show_export(self):
+        name, ok = QtGui.QInputDialog.getText(self, 'Export to Gephi format', 'Enter file name :')
 
     def update_categories(self):
         #update selected categories
