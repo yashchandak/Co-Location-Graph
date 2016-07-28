@@ -87,9 +87,6 @@ def apx_distance(x,y):
     #print ('%s : %s : %f : %f : %f : %f ' % (x[0], y[0], curr_ratio, act_ratio, z_ratio, max(1, int(dist))))
     return dist
   
-def get_edges_with_weights(results):
-    #returns a list of (edge, weight)
-    return [(results[i][0]+results[j][0], apx_distance(results[i], results[j])) \
-            for i in range(len(results)) for j in range(i, len(results))]
+
         
             

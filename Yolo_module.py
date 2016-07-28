@@ -49,7 +49,6 @@ class YOLO_TF:
     
     def __init__(self,argvs = []):    
         tf.reset_default_graph() #reset graph variables from the canvas (useful for multiple time execution in same Ipython shell), tf.close() doesn't remove graph variables from canvas.
-        self.class2idx = {item:i  for i,item in enumerate(self.classes)}
         self.argv_parser(argvs)         
         self.build_networks(training = False)
         #self.training()

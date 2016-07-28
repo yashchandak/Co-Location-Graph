@@ -17,7 +17,7 @@ from heapq import nsmallest, nlargest
 import pickle
 import cv2
 import numpy as np
-from graph_module import get_edges_with_weights
+from graph_module import apx_distance
 
 Ui_MainWindow, QMainWindow = loadUiType('CBIR_gui.ui')
 
@@ -37,6 +37,9 @@ class CBIR(QMainWindow, Ui_MainWindow):
     #class variables
     flag = True
     categories = {}
+    classes =  ["Aeroplane", "Bicycle", "Bird", "Boat", "Bottle", "Bus", "Car", "Cat", "Chair", "Cow", "Dining Table", "Dog", "Horse", "Motorbike", "Person", "Potted plant", "Sheep", "Sofa", "Train","Tv"]
+    mask = np.zeros(len(classes))    
+    class2idx = {item:i  for i,item in enumerate(classes)}
     valid_images = ["jpg","png","tga", "pgm", "jpeg"]
     valid_videos = ["mp4", "avi"]
     edge_threshold = 100
@@ -49,6 +52,8 @@ class CBIR(QMainWindow, Ui_MainWindow):
     images_per_row = 2 
     cached_db = {}
     cached_db_path = ''
+    alpha = 16 
+    beta = 0.8
     
     def __init__(self, ):
         super(CBIR, self).__init__()        #initialise from the ui designed by Designer App
@@ -97,7 +102,6 @@ class CBIR(QMainWindow, Ui_MainWindow):
        msg.setWindowTitle("About Us")
        msg.setText("Semantic Entity graph based Image matching")       
        msg.setInformativeText("Developed by Yash Chandak, under supervision of Prof. Babiga Birregah, University of Technology, Troyes")
-       
        #Section for further details on how to use the software
        f = open('HowTo.txt', 'r')
        msg.setDetailedText(f.read())
@@ -123,8 +127,12 @@ class CBIR(QMainWindow, Ui_MainWindow):
     
     def update_categories(self):
         #update selected categories
+        self.mask.fill(0)
         for radiobox in self.findChildren(QtGui.QRadioButton):
             self.categories[radiobox.text()] = radiobox.isChecked()
+            if not radiobox.text() == 'All': self.mask[self.class2idx[radiobox.text()]] = radiobox.isChecked()
+            
+        if self.categories.get('All',0) == 1: self.mask.fill(1)
 
     def update_LCD(self):
         #update edge_threshold variable based on slider
@@ -147,141 +155,106 @@ class CBIR(QMainWindow, Ui_MainWindow):
             #self.tableWidget.setCellWidget(row, col,  ImgWidget(imagePath = self.cached_db[picture][0], size=self.thumbnail_size))            
             self.tableWidget.setCellWidget(row, col,  ImgWidget(imagePath = base_dir+'/'+picture, size=self.thumbnail_size))            
 
-    def read_database(self, ext):
+    def read_database(self):
         #Option to select database
         if self.database_path == '':
             print("Database file not selected")
             self.select_database()        
         
         found = False        
-        if self.cached_db_path == self.database_path and self.cached_db_ext == ext:
+        if self.cached_db_path == self.database_path:
             #No need to re-read from cPickle if it's re-run on the same db
             found = True
         
         #Search for any pre-existing db file
         else:
             self.cached_db_path = self.database_path
-            self.cached_db_ext = ext
             for file in os.listdir(self.database_path):              #list all the files in the folder
                 extension = file.split('.')[1]        #get the file extension
-                if extension.lower() == ext:      #check for pickled cached_db file
+                if extension.lower() == 'db':      #check for pickled cached_db file
                     self.cached_db = pickle.load(open(self.database_path+'/'+file, 'rb'))
                     print("Cached database found!")
                     found = True
                     break
                 
         #Create a new db if no exiting db is found
-        if not found:
-            if ext == 'db_vec': self.cached_db = self.make_db_vectorised(self.database_path)
-            else: self.cached_db = self.make_db(self.database_path)
+        if not found:   self.cached_db = self.make_db(self.database_path)
 
-    def make_db_vectorised(self, path):
-        #right now storing full paths, just for convenience, can be removed later
-        #store the other results also, including the graph edge weights
-        print("caching database..")
         
-        cached_db = {}             
-        for file in os.listdir(path):              #list all the fileiles in the folder
-            ext = file.split('.')[1]        #get the file extension
-            if ext.lower() in self.valid_images:
-                print(file)
-                full_path = path+'/'+file
-                self.tag_image(filename = full_path)
-                #Storage format = {name : [path, vec, full_results]}
-                cached_db[file] = [full_path, self.get_vec(self.classifier.result), self.classifier.result]
-                
-        pickle.dump(cached_db, open(path+'/cache.db_vec', 'wb'))
-        return cached_db
-
-    def get_vec(self, results):
+    def count_diff(self, v1, v2):       
+        w = [self.alpha if i==0 else 1 for i in v1 ]
+        return  np.sum(self.mask*w*np.power((v1 - v2), 2)) #sum of weighted Squared error, masked by selected classes        
+    
+    def loc_diff(self, w1, w2):
+        #more the difference, the less the score
+        return 1
+        return 1/np.exp(np.abs(w1-w2))
+        
+    def score(self, edges, vec, db_img):
+        return self.beta*self.count_diff(vec, self.cached_db['vec'][db_img]) \
+                + (1-self.beta)*self.loc_diff(edges, self.cached_db['edges'][db_img])        
+        
+    def get_vec_and_classes(self, results):
         vec = np.zeros(len(self.classifier.classes))
+        classes_present = []
         for result in results:
-            vec[self.classifier.class2idx[result[0]]] += 1
-        return vec
+            vec[self.class2idx[result[0]]] += 1
+            classes_present.append(result[0])
+        return vec, set(classes_present)      
         
-    def difference(self, g1, g2):
+    def order(self, c1, c2):
+        #edge nodes concatenated in alphabetical order to create edge name
+        if self.class2idx[c1]< self.class2idx[c2]: return c1+c2
+        else: return c2+c1
         
-        if sum(g1*g2) == 0: return 99999
-        alpha = 16        
-        w = [alpha if i==0 else 1 for i in g1 ]
-        diff = np.power(w*(g1 - g2), 2).sum() #Squared error
-        self.not_completely_diff += 1
-        return diff
-            
-    def find_similar_using_vector(self, results):
-        #do pattern matching on the images in retrieved cached_db
-        #keep top 10
-        #display the top 10 images on right
-        self.read_database(ext = 'db_vec')
-        
-        #check if database atleast has more images than k.
-        if len(self.cached_db.keys()) < self.topk: best_matches = self.cached_db.keys()
-        else:
-            self.not_completely_diff = 0
-            best_matches = nsmallest(self.topk, self.cached_db.keys(), \
-                            key = lambda e: self.difference(self.get_vec(results), self.cached_db[e][1] ))
-        
-        if self.not_completely_diff < self.topk: 
-            best_matches = best_matches[:self.not_completely_diff]
-            
-        self.show_similar(best_matches)
-    
-    
+    def get_edges_with_weights(self, results):
+        #returns a list of (edge, weight)
+        return [(self.order(results[i][0], results[j][0]), apx_distance(results[i], results[j])) \
+                for i in range(len(results)) for j in range(i, len(results))]  
+                
     def make_db(self, path):
         print("caching database..")
-        classes =  ["Aeroplane", "Bicycle", "Bird", "Boat", "Bottle", "Bus", "Car", "Cat", "Chair", "Cow", "Dining Table", "Dog", "Horse", "Motorbike", "Person", "Potted plant", "Sheep", "Sofa", "Train","Tv"]   
-        tag2idx = {}
-        counter = 0
-        idx2tag = []
-        data = {}
-        for i in range(len(classes)):
-            for j in range(i, len(classes)):
-                tag2idx[classes[i]+classes[j]] = counter
-                counter += 1
-                idx2tag.append(classes[i]+classes[j])
-                #TODO: [IMPROVE] make the edges non-directional!!
-                data[classes[i]+classes[j]] = []
-                data[classes[j]+classes[i]] = [] #workaround solution
-                
-        #Storage format = {dir, tag2idx, idx2tag, data : {edge : [(file1, weight1), .. , (fileN, weightN)]}}        
-        cached_db = {'dir': path, 'tag2idx': tag2idx,'idx2tag': idx2tag, 'data': data}
-        print(cached_db)
-        #cached_db['data'] = {classes[i]+classes[j] : [] for i in range(len(classes)) for j in range(i, len(classes))}
-        
-                     
+        inv_map = {c:[] for c in self.classes}
+        edges = {}
+        vec = {}
         for file in os.listdir(path):              #list all the fileiles in the folder
             ext = file.split('.')[1]        #get the file extension
             if ext.lower() in self.valid_images:
                 print(file)
                 full_path = path+'/'+file
                 self.tag_image(filename = full_path)
+
+                #store the all the edges and weights for the image
+                edges[file] = self.get_edges_with_weights(self.classifier.result)
                 
-                for edge, weight in get_edges_with_weights(self.classifier.result):
-                    cached_db['data'][edge].append((file, weight))
-                
+                #create the inverse map( class -> images )
+                v, classes_present = self.get_vec_and_classes(self.classifier.result)
+                vec[file] = v
+                for c in classes_present:
+                    inv_map[c].append(file)
+        
+        #Storage format = {dir, inv_map[class]->images, vectors[image]->vec, edges[image]->edges}        
+        cached_db = {'dir': path, 'inv_map': inv_map, 'vec': vec, 'edges':edges}        
         pickle.dump(cached_db, open(path+'/cache.db', 'wb'))
         return cached_db
         
     def find_similar(self, results):
-        #TODO : [PROBLEM] No penalty accounted for extra/irrelevant objects
         #do pattern matching on the images in retrieved cached_db
         #keep top 10 and display on right
-        self.read_database(ext = 'db')
-        edges = get_edges_with_weights(results)
-        files = {}
-        for edge, e_weight in edges:
-            for img, i_weight in self.cached_db['data'][edge]:
-                #cummulatively update the scores of files
-                files[img] = files.get(img, 0) +  self.get_match_score(e_weight, i_weight)        
-
-        best_matches = nlargest(self.topk, files.keys(), key = lambda e: files[e] )            
-        self.show_similar(best_matches, self.cached_db['dir'])
-    
-    def get_match_score(self, w1, w2):
-        #more the difference, the less the score
-        return 1/np.exp(np.abs(w1-w2))
+        self.read_database()
         
-      
+        #get the edges, vector, classes_present in the query image
+        edges = self.get_edges_with_weights(results)
+        vec, classes_present = self.get_vec_and_classes(results)
+        
+        #get all the images having at least one occurence of the class present in query image
+        imgs = set([img for c in classes_present for img in self.cached_db['inv_map'][c]]) 
+
+        #choose the topK similar images from the images retrieved from database
+        best_matches = nsmallest(self.topk, imgs, key = lambda e: self.score(edges, vec, e))
+           
+        self.show_similar(best_matches, self.cached_db['dir'])
+
         
     def tag_image(self, filename = None, batch = False, image = None ):
         #importing TensorFlow on top causes segmentation fault (official bug #2034)
