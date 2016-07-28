@@ -1,0 +1,40 @@
+How-To-Guide for the Application
+
+================================
+Co-Location(Graph visualisation for single/batch images or videos)
+
+
+The toolbar on top:
+
+First buttin is for about us and How-to-Use
+Second button is to set up the frameskip rate for video inputs.
+Third one is to export the graph in Gephi format
+
+
+Entity Categories on Left:
+
+Radio Buttons for all the categories are present. They Can all be toggled independently. Based on the selected categories, the results are generated.
+If 'All' is selected, then irrespective of wether the class's radio button is checked or unchecked, they are all considered selected.
+
+
+Imput Fields:
+
+The Batch field > A folder containing the images can be selected. Semantic entity graph for each of the images in the folder will be generated and displayed together on the graph display section
+
+The Single field > A single file can be uploaded here. It can be either an image or any video. For videos, the frames are skipped as per the frameskiprate (which can be set using the 'settings' tool in the toolbar). The graph for the frames are generated and displayed continuously, it can be useful to analyse the co-occurence pattern or find anomaly in the series.
+
+The stop button > It can be used to stop the video while it's running.
+
+The time fields > (Not programmed as of now) It can be used to filter the images in the folder which fall within the desired time range
+
+The Edge threshold slider  > It can be used to set the threshold for the edges between the entities. Any edge having weight more than this will not be displayed in the dislplay section.
+
+
+Display Fields:
+
+On the top-left, the query image is displayed.
+On the bottom-left, the query images with the tagged entities are displayed.
+On right, the abstracted semantic graph for the imag is displayed.
+
+
+=================================

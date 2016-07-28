@@ -159,20 +159,20 @@ class YOLO_TF:
         return tf.maximum(self.alpha*ip,ip,name=str(idx)+'_fc')
 
     
-    def training(self): #TODO add training function!
-        learning_rate = 0.0001
-        momentum = 0.9
-        decay = 0.0005
-        batch_size = 64
-        
-        object_scale=1
-        noobject_scale=.5
-        class_scale=1
-        coord_scale=5
-     
-        class_probs = tf.slice(self.fc_19, [0], [self.grid_size**2 * self.num_class])
-        scales      = tf.slice(self.fc_19, [self.grid_size**2 * self.num_class], [self.grid_size**2 * self.num_box])
-        boxes       = tf.slice(self.fc_19, [self.grid_size**2 *(self.num_class + self.num_box)], [-1])
+#    def training(self): #TODO add training function!
+#        learning_rate = 0.0001
+#        momentum = 0.9
+#        decay = 0.0005
+#        batch_size = 64
+#        
+#        object_scale=1
+#        noobject_scale=.5
+#        class_scale=1
+#        coord_scale=5
+#     
+#        class_probs = tf.slice(self.fc_19, [0], [self.grid_size**2 * self.num_class])
+#        scales      = tf.slice(self.fc_19, [self.grid_size**2 * self.num_class], [self.grid_size**2 * self.num_box])
+#        boxes       = tf.slice(self.fc_19, [self.grid_size**2 *(self.num_class + self.num_box)], [-1])
 
         
 #        # Define loss and optimizer

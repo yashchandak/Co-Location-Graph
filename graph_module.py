@@ -18,7 +18,7 @@ classes_ratio =  {"Aeroplane" : 1500 , "Bicycle" : 150, "Bird" : 20, "Boat" : 20
    
 size_factor = 100
 
-def co_location(all_results, axf, thresh, selected):
+def co_location(all_results, axf, thresh, selected, gephi_name = ''):
     node_sizes  = []
     labels      = {}
     edge_labels = {}
@@ -77,13 +77,16 @@ def co_location(all_results, axf, thresh, selected):
     nx.draw_networkx_labels(G, pos, labels = labels, ax=axf)
     nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels, font_color = 'b',font_size = 8, label_pos = 0.3, ax=axf, )
 
+    if gephi_name != '':
+        nx.write_gexf(G, gephi_name)
+   
    
 def apx_distance(x,y):
     #very crude approximation of distance
     curr_ratio  = (x[3]*x[4])/(y[3]*y[4])
     act_ratio   = classes_ratio[x[0]]/classes_ratio[y[0]]
     z_ratio     = max(curr_ratio, act_ratio)/min(curr_ratio, act_ratio)
-    dist        = 0.1* np.sqrt( (x[1] - y[1])**2 + (x[2] - y[2])**2)*z_ratio
+    dist        = 0.1* np.sqrt( (x[1] - y[1])**2 + (x[2] - y[2])**2 + z_ratio)
     #print ('%s : %s : %f : %f : %f : %f ' % (x[0], y[0], curr_ratio, act_ratio, z_ratio, max(1, int(dist))))
     return dist
   

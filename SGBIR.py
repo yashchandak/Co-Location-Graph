@@ -13,13 +13,13 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.uic import loadUiType
 from PyQt4.QtGui import QGraphicsScene, QFileDialog, QPixmap,  QMessageBox#, QWidget, QPushButton
 
-from heapq import nsmallest, nlargest
+from heapq import nsmallest
 import pickle
 import cv2
 import numpy as np
 from graph_module import apx_distance
 
-Ui_MainWindow, QMainWindow = loadUiType('CBIR_gui.ui')
+Ui_MainWindow, QMainWindow = loadUiType('SGBIR_gui.ui')
 
 class ImgWidget(QtGui.QLabel):
     ##IMP: IF using QtDesigner to make tables, make sure to set default row, column to non zero values
@@ -100,10 +100,10 @@ class CBIR(QMainWindow, Ui_MainWindow):
        #setup title, main heading, about us info
        msg.setIcon(QMessageBox.Information) 
        msg.setWindowTitle("About Us")
-       msg.setText("Semantic Entity graph based Image matching")       
+       msg.setText("Semantic Graph based Image matching")       
        msg.setInformativeText("Developed by Yash Chandak, under supervision of Prof. Babiga Birregah, University of Technology, Troyes")
        #Section for further details on how to use the software
-       f = open('HowTo.txt', 'r')
+       f = open('How-To/how-to-SGBIR.txt', 'r')
        msg.setDetailedText(f.read())
        
        #setup return buttons
@@ -111,8 +111,8 @@ class CBIR(QMainWindow, Ui_MainWindow):
        msg.exec_()
 
     def show_settings(self):
-        framerate, ok = QtGui.QInputDialog.getInt(self, 'Settings', 'Enter Frame Rate for Videos:')
-        self.framerate = framerate
+        topk, ok = QtGui.QInputDialog.getInt(self, 'Settings', 'Enter Frame Rate for Videos:')
+        self.topk = topk
         
     def show_export(self):
         #TODO gephi export
@@ -191,10 +191,12 @@ class CBIR(QMainWindow, Ui_MainWindow):
         return 1/np.exp(np.abs(w1-w2))
         
     def score(self, edges, vec, db_img):
+        #weighted score of location deifference and count difference
         return self.beta*self.count_diff(vec, self.cached_db['vec'][db_img]) \
                 + (1-self.beta)*self.loc_diff(edges, self.cached_db['edges'][db_img])        
         
     def get_vec_and_classes(self, results):
+        #returns vector and all unique classes for the given image result.
         vec = np.zeros(len(self.classifier.classes))
         classes_present = []
         for result in results:
@@ -279,6 +281,7 @@ class CBIR(QMainWindow, Ui_MainWindow):
     def disp_img(self, filename = None, img = None):
         if not img == None:
             img_rgb = img.copy()
+            #convert image to PyQt display format
             cv2.cvtColor(img, cv2.COLOR_BGR2RGB, img_rgb)
             img_rgb = QtGui.QImage(img_rgb, img_rgb.shape[1], img_rgb.shape[0], img_rgb.shape[1] * 3,QtGui.QImage.Format_RGB888) 
             self.scene.addPixmap(QPixmap(img_rgb).scaled(self.graphicsView.size(), QtCore.Qt.KeepAspectRatio))

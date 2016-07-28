@@ -1,0 +1,36 @@
+How-To-Guide for the Application
+
+==============================
+SGBIR(Semantic Graph Based Image retrieval)
+
+
+The toolbar on top:
+
+First button is for about us and How-to-Use.
+Second button is to set up the required number of similar images.
+Third one is to export the graph is Gephi format.
+
+
+Entity Categories on Left:
+
+Radio Buttons for all the categories are present. They Can all be toggled independently. Based on the selected categories, the results are generated.
+If 'All' is selected, then irrespective of wether the class's radio button is checked or unchecked, they are all considered selected.
+
+
+Input Fields:
+
+The Database field > It is used to select the folder within which the similar images needs to be searched. If the foler is chosen for the first time, the application will go over all the images and create cached database containing the abstracted semantic graph. From next run onwards, it will directly read from that cached file.
+
+The Image field > It is used to select the query image for which similar images are required to be searched.
+
+Edge Threshold > It is only useful for Co-Location application. Can be ignored for image retrieval application.
+
+
+Display Fields:
+
+On the top-left, the query image is displayed.
+On the bottom-left, the query images with the tagged entities are displayed.
+On right, the top k similar images are shown according to their rank. The topmost ones are the most similar.
+
+
+===========================

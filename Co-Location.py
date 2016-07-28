@@ -17,7 +17,7 @@ import os
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.uic import loadUiType
-from PyQt4.QtGui import QGraphicsScene, QFileDialog, QPixmap
+from PyQt4.QtGui import QGraphicsScene, QFileDialog, QPixmap,QMessageBox
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -35,17 +35,19 @@ class CoLocation(QMainWindow, Ui_MainWindow):
     edge_threshold = 100
     to_disp = [] 
     stop = False
+    framerate = 20
+    export_name =''
     def __init__(self, ):
         super(CoLocation, self).__init__()        #initialise from the ui designed by Designer App
         self.setupUi(self)
         self.setupUi_custom()
-        Help = QtGui.QAction(QtGui.QIcon('info.png'), 'Help', self)
+        Help = QtGui.QAction(QtGui.QIcon('images/info.png'), 'Help', self)
         Help.triggered.connect(self.show_help)
         
-        Settings = QtGui.QAction(QtGui.QIcon('settings.png'), 'Settings', self)
+        Settings = QtGui.QAction(QtGui.QIcon('images/settings.png'), 'Settings', self)
         Settings.triggered.connect(self.show_settings)
         
-        Export = QtGui.QAction(QtGui.QIcon('export.png'), 'Export', self)
+        Export = QtGui.QAction(QtGui.QIcon('images/export.png'), 'Export', self)
         Export.triggered.connect(self.show_export)
         
         ##To set up the toolbar
@@ -59,13 +61,13 @@ class CoLocation(QMainWindow, Ui_MainWindow):
     def show_help(self):
        msg = QMessageBox()
        msg.setIcon(QMessageBox.Information)    
-       msg.setText("Semantic Entity graph based Image matching")
-       f = open('HowTo.txt', 'r')
+       msg.setText("Co-Location Visualisation")
+       f = open('How-To/how-to-Co-Location.txt', 'r')
        msg.setInformativeText("Developed by Yash Chandak, under supervision of Prof. Babiga Birregah, University of Technology, Troyes")
        msg.setWindowTitle("About Us")
        msg.setDetailedText(f.read())
        msg.setStandardButtons(QMessageBox.Ok )    	
-       retval = msg.exec_()
+       msg.exec_()
 
     def show_settings(self):
         framerate, ok = QtGui.QInputDialog.getInt(self, 'Settings', 'Enter Frame Rate for Videos:')
@@ -73,12 +75,12 @@ class CoLocation(QMainWindow, Ui_MainWindow):
         
     def show_export(self):
         name, ok = QtGui.QInputDialog.getText(self, 'Export to Gephi format', 'Enter file name :')
+        self.export_name = name + '.gefx'
 
     def update_categories(self):
         #update selected categories
         for radiobox in self.findChildren(QtGui.QRadioButton):
-            self.categories[radiobox.text()] = radiobox.isChecked()
-    
+            self.categories[radiobox.text()] = radiobox.isChecked()    
      
     def setupUi_custom(self,):    
         self.scene = QGraphicsScene()
@@ -89,7 +91,7 @@ class CoLocation(QMainWindow, Ui_MainWindow):
         self.pushButton_3.clicked.connect(self.selectFile_from_folder)
         self.stop_button.clicked.connect(self.set_stop)
         #TODO [WEIRD PROBLEM] QPixmap needs to be called at least once with JPG image before tensorFlow, otherwise program crashes
-        self.scene.addPixmap(QPixmap(os.getcwd()+"/demo.jpg").scaled(self.graphicsView.size(), QtCore.Qt.KeepAspectRatio))
+        self.scene.addPixmap(QPixmap(os.getcwd()+"/images/demo.jpg").scaled(self.graphicsView.size(), QtCore.Qt.KeepAspectRatio))
         self.graphicsView.setScene(self.scene)  
         
         #Add blank canvas initially
@@ -146,7 +148,7 @@ class CoLocation(QMainWindow, Ui_MainWindow):
         self.graphicsView_3.setScene(self.scene2)        
         
         
-    def disp_graph(self, result = []):    
+    def disp_graph(self, result = [], graph_name =''):    
         import graph_module as gm
         
         self.update_categories()
@@ -159,7 +161,7 @@ class CoLocation(QMainWindow, Ui_MainWindow):
         fig.set_facecolor('w')
         axf = fig.add_subplot(111)
         axf.set_axis_off()        
-        gm.co_location(self.to_disp, axf, self.edge_threshold, self.categories) #get updated graph
+        gm.co_location(self.to_disp, axf, self.edge_threshold, self.categories, graph_name) #get updated graph
         self.addmpl(fig)
         print("graph added")
     
@@ -192,9 +194,11 @@ class CoLocation(QMainWindow, Ui_MainWindow):
         filename = QFileDialog.getOpenFileName(directory = '/home/yash/Downloads/Pascal VOC 2012/samples')
         self.lineEdit.setText(filename)
         
+        #check if file is valid video
         if filename.split('.')[1] in self.valid_videos:
-            self.disp_video(filename)
+            self.disp_video(filename, self.framerate)
         
+        #check if the file is valid
         elif filename.split('.')[1] in self.valid_images:
             self.disp_img(filename = filename)
             self.disp_graph([self.classifier.result]) #list of 1 resultant list
@@ -223,7 +227,7 @@ class CoLocation(QMainWindow, Ui_MainWindow):
         self.scene.clear()
         self.scene2.clear()    
         
-        self.disp_graph(self.batch_results)
+        self.disp_graph(self.batch_results, self.export_name)
         
     def addmpl(self, fig):
         #Add figure to canvas and widget

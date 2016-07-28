@@ -1,0 +1,27 @@
+How-to-guide to setup the applications
+
+==============================
+Requirements:
+
+Python 3.5		: Main programming language
+Tensorflow 0.8	: Deep Learning library for entity tagging
+PyQt4	   		: Python GUI library
+Networkx		: Python Graph library
+OpenCV			: Library for image processing
+Numpy/Matplotlib: Python numeric calculation libraries
+
+
+Source Code:
+
+The latest up to date code can be found at:
+https://github.com/yashchandak/Co-Location-Graph
+
+Execution:
+
+To execute Semantic Graph Based Image Retrieval:
+'python SGBIR.py'
+
+To visualise co-location Graphs:
+'python Co-Location.py'
+
+=====================================
