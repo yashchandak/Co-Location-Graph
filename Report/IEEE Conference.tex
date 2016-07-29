@@ -241,6 +241,8 @@
 % Read the url.sty source comments for usage information. Basically,
 % \url{my_url_here}.
 
+%for back referencing citations
+\usepackage[pagebackref]{hyperref}
 
 \usepackage{graphicx}
 \graphicspath{{images/}}
@@ -284,7 +286,7 @@ babiga.birregah@utt.fr}
 \begin{abstract}
 %\boldmath
 We present a methodology to develop novel applications that harness the current state of the art in deep learning for object detection. Building upong the YOLO framework, we obtain unified results for detection and localisation of entities in real-time scenario. We add a layer of abstraction on top of the images that represents it as a semantic graph of object entities in the image. This layer of abstraction helps in analysis of image contents in a more robust and tranform invariant way.  We use this graph for visualising the interaction pattern of objects and develop a semantic content based image retrieval system. This work presents a proof of concept which can be further extended to automatically find anomalies encoutered during video surveillance tasks or to build recommender systems based on interest profile of users on the social media based on the entities in the images that they share. The code can be found at:
-https://github.com/yashchandak/Co-Location-Graph 
+https://github.com/yashchandak/Co-Location-Graph \\
 
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
@@ -295,7 +297,7 @@ https://github.com/yashchandak/Co-Location-Graph
 % math in the abstract anyway.
 
 % no keywords
-\\ \\
+
 \textbf{Keywords: co-location, co-occurence, semantic graph matching}
 
 % For peer review papers, you can put extra information on the cover
@@ -506,7 +508,7 @@ There is vast scope of expanding the representational power of these semantic gr
 
 
 \section{Conclusion}
-We presented a novel methodology to extract the semantic based entity graph from the image and perform various analysis tasks on it. It is a step forward in harnessing the advancements in the deep learning community and enhancing real world applications. Our method demonstrate more robustness as compared to ones based on only visual similarity and present the users with more sophisticated tools for their tasks. We have made the source available to promote future enhancements and collaborations.
+We presented a novel methodology to extract the semantic based entity graph from the image and perform various analysis tasks on it. It is a step forward in harnessing the advancements in the deep learning community and enhancing real world applications. Our method demonstrate more robustness as compared to ones based on only visual similarity and present the users with more sophisticated tools for their tasks.The source code is built using \cite{tensorflow} \cite{random}and is openly available to promote future enhancements and collaborations.
 
 
 % conference papers do not normally have an appendix
