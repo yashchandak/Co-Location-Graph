@@ -111,7 +111,7 @@ class CBIR(QMainWindow, Ui_MainWindow):
        msg.exec_()
 
     def show_settings(self):
-        topk, ok = QtGui.QInputDialog.getInt(self, 'Settings', 'Enter Frame Rate for Videos:')
+        topk, ok = QtGui.QInputDialog.getInt(self, 'Settings', 'Number of results to display')
         self.topk = topk
         
     def show_export(self):
@@ -188,6 +188,7 @@ class CBIR(QMainWindow, Ui_MainWindow):
     def loc_diff(self, w1, w2):
         #more the difference, the less the score
         return 1
+        #TODO: add the details
         return 1/np.exp(np.abs(w1-w2))
         
     def score(self, edges, vec, db_img):
@@ -305,6 +306,7 @@ class CBIR(QMainWindow, Ui_MainWindow):
         #Clear previous image displays        
         self.scene.clear()
         self.scene2.clear()
+        self.tableWidget.clearContents()
         self.update_categories() #update categories to incorporate any changes made
         
         #Change the file path to any default directory, as per need.             
