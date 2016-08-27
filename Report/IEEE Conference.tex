@@ -313,10 +313,14 @@ This paper presents a methodology to develop novel approach for the detection an
 
 
 \section{Introduction}
-Humans have a natural ability to identify the objects from the images at a semantic level in a very robust way: invariant to illumination, pose and other geometric transforms. On identifying these objects, we humans sub-consciously start relating stuff to each other based on their interaction pattern. This pattern can either be in sense of co-location, where we start relating items in terms of how often we see them together or in a slightly different way of co-occurence, which relates them on basis of occurence under a perceived time interval. Thus enabling us to take a broader view of the subject and respond accordingly when confronted with task such as categorsing a scene in general or identifying pecularities in the way things are proceeding. It is  a long standing research objective to develop mathematical models that can govern the machines to do the same automatically. Current state of the art in deep learning community have shown significant progress along this line to identify various objects present in the image. In this paper, we propose real purpose applications that can harness this input from machine learning and can be utilised for various tasks under a common, unified framework. Our primary contributions involve:
+Human brain is a very complex model, encorporating over 100 Billions neurons that work concurrently to derive sense out of the perceived world. Visual cortex forms a small section of the brain, which deals with understanding the visual inputs coming through the eyes. It does a tremendous job of converting raw light input falling onto retina into meaningful entities and deriving broader sense out of it. We have this natural ability to identify the objects from the images at a semantic level in a very robust way: invariant to illumination, pose and other geometric transforms. On identifying these objects, we humans sub-consciously start relating stuff to each other based on their interaction pattern. This pattern can either be in sense of co-location, where we start relating items in terms of how often we see them together or in a slightly different way of co-occurence, which relates them on basis of occurence under a stipulated time interval. It thus enabling us to take a broader view of the subject and respond accordingly when confronted with task such as categorsing a scene in general or identifying pecularities in the way things are proceeding. It is  a long standing research objective to develop mathematical models that can govern the machines to do the same automatically. 
+\\
+Early works tried building shallow descriptors \cite{sift}, \cite{surf} that could be used to categorise certain set of objects. Soon, mid-level features \cite{HOG} became prevelant to identify objects. It had better robustness against on detecting objects even when presented with slight transformations, but these methods were far away from human level object detection and understanding. Convolutional Neural networks \cite{leNet} helped in further bridging this difference. Current state of the art models \cite{yolo} , \cite{overfeat} in deep learning community have shown significant progress in identifying various entities present in the image.
+
+\\In this paper, we harness this input from machine learning models and build a semantic entity relation graph on top of it to derive a broader understanding of the entire scene. We propose real purpose applications that can  utilise this information for various tasks, under a common and unified framework. Our primary contributions involve:
     \begin{enumerate}
         \item End to End pipeline; from tagging Entities in the image and videos to developing their co-location graph and it's usage in vairous applications.
-        \item Building Entity co-location graphs in an efficiently scalable, Map-reduce compatible technique.
+        \item Building Entity co-location graphs in an efficiently scalable, Map-reduce compatible procedure.
         \item Graphical visualisation of entity co-location pattern.
         \item Analysing video stream for user provided emtity's semantic pattern
         \item Semantic content based image retrieval system using the extracted entity relations.
@@ -330,22 +334,29 @@ The paper is broadly divided into 5 sections. Next section revisits the related 
   \label{fig:C0-Loc-Diagram}
 \end{figure}
 
-\section{Related Works}
+\section{Background}
 
-Understanding the image context has been a long standing research objctive. Earlier works \cite{} \cite{} utilised the very low level set of pixel features and used it for scoring functions
+Understanding the image context has been a long standing research objctive. Early works on Scene modeling \cite{scene-modeling} used the procedure which was based on a very low dimensional representation of the scene, that they termed as the "Spatial Envelope". They proposed a set of perceptual dimensions (naturalness, openness, roughness, expansion, ruggedness) caculated using spectral and coarsely localized information, that helped in describing the pre-dominant spatial structure of a scene. On other hand, other works aimed at extending GIST \cite{gist}, SIFT{\cite{sift} and other shallow descriptors to derive an overall sense of the image scene.  Beyond Bag of Features \cite{beyondBOW} partitioned the image into increasingly fine sub-regions and computed histograms of local features within each sub-region. The resultant "spatial pyramid" was used for final scene classification. Further work on describing objects by their properties  \cite{image-description} utilised HOG \cite{HOG} features to classify based on understanding fine attributes like furry, spotty, quadrupedal etc of the object. Current models \cite{cnn} \cite{fcnn} \cite{scene-rcnn} \cite{scene-rnn} \cite{scene-lstm}  make heavy use of convolutional and recurrent neural networks for parsing and understanding the overall scene.
 
-Midlevel features \cite{sift}, \cite{surf}, \cite{HOG} 
+Entity information in a single image can be used in videos for understanding each frame and identifying other entities in the upcoming frame with more accuracy probablistically. Such information is critical for surveillance purpose and video classification tasks. Early works \cite{semantic-video-surveillance} utilised  moving object information to track and cluster the trajectories throughout the video.  Mid level features with hierarchical behaviour model was further used for event detection and recognition in semantically annotating video \cite{semantic-video-annotation}. Recent works \cite{video-cnn} \cite{video-to-text} use deep neural nets for classifying videos as well as genrating descriptions out of it based on the entities identified during th run time. Our work primary deals with visualising the entity location pattern from frame to frame basis rather than an overall one for the entire video.
 
-image description \cite{babytalk} \cite{visual-features}, \cite{multi-attribute-image-rank}, \cite{label-image-rank} ,\cite{weak-image-rank} \cite{attribute-anomaly} 
+Developing semantic graph layer on top of images have been successfully utilised by researchers in past for utilising the extracted attributs from the scene and developing applications on top of it. BabyTalk \cite{babytalk} constructed a CRF graph on top of entities detected in an image and trained their N-gram language model to generate description based on that. 
 
-video \cite{semantic-video-surveillance} \cite{semantic-video-annotation} , \cite{semantic-image-tag}
-
-
- graph \cite{weak-superpixel-semantic-graph}    \cite{semantic-graph} \cite{semantic-image-distance} 
+  
+ \cite{graph-semantic-hashing}
+ \cite{semantic-image-distance} 
  
- matching\cite{random-walk-match}, \cite{graph-semantic-hashing}
+ cbir \cite{visual-features}, 
+ \cite{multi-attribute-image-rank},
+ \cite{label-image-rank} ,
+ \cite{weak-image-rank}
+ \cite{attribute-anomaly}
+ \cite{semantic-image-tag} 
+ \cite{semantic-graph} 
  
- closest \cite{attribute-graph} \cite{map-reduce-image}
+ closest \cite{attribute-graph} 
+ This work goes in extra fine details of objects
+ Literature has been majorly governed by 
 
 \section{Methods}
 Our proposed system can be broadly divided in 5 parts: 
@@ -359,7 +370,7 @@ Our proposed system can be broadly divided in 5 parts:
     
     \subsection{The Entity Tagger}
         This section is completely independent of the pipeline and can be replaced with any state of the art object detection technique to keep the final results of the application updated. For the current system we have used the YOLO detector because of it's speed and unified detection and localisation abilities. \\ \\
-        The network design of it's framework is inspired by the GoogLeNet model for image classification. It is first pre-trained on the ImageNet and then the entire model with additional four convolutional layers on top is fine tuned by training it on the PASCAL VOC 2012 dataset which consists of 20 entity categories. It divides the entire image in S*S grid and predicts B bounding boxes for each section. Each bounding box contains 5 items: x,y, width, height and IoU conficence. The centre co-ordinates(x,y) are normalised in the range of 0-1 relative to the corresponding section, whereas the width and height are normalised in the range of 0-1 relative to the width and height of the input image. It also predicts the class probablities for C classes in each section. This enables it to predict the classes of the objects and their respective locations in the image simultaneously.
+        The network design of it's framework is inspired by the GoogLeNet model for image classification. It is first pre-trained on the ImageNet and then the entire model with additional four convolutional layers on top is fine tuned by training it on the PASCAL VOC 2012 \cite{pascal-voc-2012} dataset which consists of 20 entity categories. It divides the entire image in S*S grid and predicts B bounding boxes for each section. Each bounding box contains 5 items: x,y, width, height and IoU conficence. The centre co-ordinates(x,y) are normalised in the range of 0-1 relative to the corresponding section, whereas the width and height are normalised in the range of 0-1 relative to the width and height of the input image. It also predicts the class probablities for C classes in each section. This enables it to predict the classes of the objects and their respective locations in the image simultaneously.
         \cite{yolo} shows the entire architecture of the Neural Network used by YOLO.
         The final tensor output of the network is of size: 
         \begin{equation}
@@ -423,7 +434,7 @@ Our proposed system can be broadly divided in 5 parts:
     Since the weights are only crude estimations of the visual distance between the entities, we use the logarithm function to reduce the effect of difference on the score.
     
     \subsection{Building cached database for CBIR}
-    To facilitate efficient scalability, we use a model similar to the inverse word mapping \cite{map-reduce-inverted-index} that can exploit the power of map reduce on distributed systems. In our model, we use the entity as the key and the values are the corresponding images in which they occur. After a final reduction we get a table which can be quickly looked up to retrieve the images containing the required entity(ies). The set of all the mathced images are then scored according to function \cite{score}. 
+    To facilitate efficient scalability, we use a model similar to the inverse word mapping \cite{map-reduce-inverted-index} \cite{map-reduce-image} that can exploit the power of map reduce on distributed systems. In our model, we use the entity as the key and the values are the corresponding images in which they occur. After a final reduction we get a table which can be quickly looked up to retrieve the images containing the required entity(ies). The set of all the mathced images are then scored according to function \cite{score}. 
 
     \subsection{Video stream analysis}
     This can be used for active search of co-occurence pattern from any video stream. Since it works directly on all the incoming image frames from the video stream, no database is directly involved. Given a query of co-locaton pattern or an image, the system notifies the user automaticaly when similar pattern is encountered in the video. It has vast potential to be deployed in surveillance cameras to automatically raise an alert if a crowd gathers unexpectedly or any peculiar pattern occurs which in anomalous to the area under surveillance. The same scoring function can be used for this task as well.
@@ -524,7 +535,7 @@ There is vast scope of expanding the representational power of these semantic gr
 
 
 \section{Conclusion}
-We presented a novel methodology to extract the semantic based entity graph from the image and perform various analysis tasks on it. It is a step forward in harnessing the advancements in the deep learning community and enhancing real world applications. Our method demonstrate more robustness as compared to ones based on only visual similarity and present the users with more sophisticated tools for their tasks.The source code is built using \cite{tensorflow} and \cite{opencv}and is openly available to promote future enhancements and collaborations.
+We presented a novel methodology to extract the semantic based entity graph from the image and perform various analysis tasks on it. It is a step forward in harnessing the advancements in the deep learning community and enhancing real world applications. Our method demonstrate more robustness as compared to ones based on only visual similarity and present the users with more sophisticated tools for their tasks.The source code is built using Tensorflow \cite{tensorflow} and OpenCV\cite{opencv}and is openly available to promote future enhancements and collaborations.
 
 
 % conference papers do not normally have an appendix
