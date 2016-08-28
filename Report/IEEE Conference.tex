@@ -286,7 +286,7 @@ babiga.birregah@utt.fr}
 
 \begin{abstract}
 %\boldmath
-This paper presents a methodology to develop novel approach for the detection and localisation of the entities in real time scenario. Using deep learning algorithms for object/entities detection, we add a semantic-based graph layer of abstraction on top of the image database. This layer of abstraction helps in analysis of image contents in a way which is more robust against illumination changes and orientation transform of the entities. Beyond the fast visualisation of the location of the entities in the image and videos, these graphs helps to develop a semantic content based image retrieval system. The code can be found at: <to be shared later...>
+This paper presents a methodology to develop novel approach for the detection and localisation of the entities in real time scenario. Using deep learning algorithms for object/entities detection, we add a semantic-based graph layer of abstraction on top of the image database. This layer of abstraction helps in analysis of image contents in a way which is more robust against illumination changes and orientation transform of the entities. Beyond the fast visualisation of the location of the entities in the image and videos, these graphs helps to develop a semantic content based image retrieval system. The code can be found at: *to be shared later...*
 
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
@@ -315,7 +315,13 @@ This paper presents a methodology to develop novel approach for the detection an
 \section{Introduction}
 Human brain is a very complex model, encorporating over 100 Billions neurons that work concurrently to derive sense out of the perceived world. Visual cortex forms a small section of the brain, which deals with understanding the visual inputs coming through the eyes. It does a tremendous job of converting raw light input falling onto retina into meaningful entities and deriving broader sense out of it. We have this natural ability to identify the objects from the images at a semantic level in a very robust way: invariant to illumination, pose and other geometric transforms. On identifying these objects, we humans sub-consciously start relating stuff to each other based on their interaction pattern. This pattern can either be in sense of co-location, where we start relating items in terms of how often we see them together or in a slightly different way of co-occurence, which relates them on basis of occurence under a stipulated time interval. It thus enabling us to take a broader view of the subject and respond accordingly when confronted with task such as categorsing a scene in general or identifying pecularities in the way things are proceeding. It is  a long standing research objective to develop mathematical models that can govern the machines to do the same automatically. 
 \\
-Early works tried building shallow descriptors \cite{sift}, \cite{surf} that could be used to categorise certain set of objects. Soon, mid-level features \cite{HOG} became prevelant to identify objects. It had better robustness against on detecting objects even when presented with slight transformations, but these methods were far away from human level object detection and understanding. Convolutional Neural networks \cite{leNet} helped in further bridging this difference. Current state of the art models \cite{yolo} , \cite{overfeat} in deep learning community have shown significant progress in identifying various entities present in the image.
+Early works tried building shallow descriptors \cite{sift}, \cite{surf} that could be used to categorise certain set of objects. Soon, mid-level features \cite{HOG} became prevelant to identify objects. It had better robustness against on detecting objects even when presented with slight transformations, but these methods were far away from human level object detection and understanding. Convolutional Neural networks \cite{lenet} helped in further bridging this difference. Current state of the art models \cite{yolo} , \cite{overfeat} in deep learning community have shown significant progress in identifying various entities present in the image.
+
+\begin{figure} [t]
+  \includegraphics[width=\linewidth]{Co-Loc-Diagram}
+  \caption{A semantic entity co-location graph is first built from the query image (on left). It is then compared for similarity with the graph abstractions of other images (on right). The images on right are arranged based on their relative similarity score, top one being the most similar. For pictorial depiction, colors of the nodes indicate the class an entity belongs to. Here, blue: person, red:bike, yellow:table, purple:TV/computer   }
+  \label{fig:C0-Loc-Diagram}
+\end{figure}
 
 \\In this paper, we harness this input from machine learning models and build a semantic entity relation graph on top of it to derive a broader understanding of the entire scene. We propose real purpose applications that can  utilise this information for various tasks, under a common and unified framework. Our primary contributions involve:
     \begin{enumerate}
@@ -328,11 +334,6 @@ Early works tried building shallow descriptors \cite{sift}, \cite{surf} that cou
 
 The paper is broadly divided into 5 sections. Next section revisits the related work done in this domain and points out their differences from our methodoligy. Section 3 describes the proposed methods. Section 4, 5 present the results and the discussion on it respectively. Section 6 shows the path for further enhancement in future.
 
-\begin{figure}
-  \includegraphics[width=\linewidth]{Co-Loc-Diagram}
-  \caption{A semantic entity co-location graph is first built from the query image (on left). It is then compared for similarity with the graph abstractions of other images (on right). The images on right are arranged based on their relative similarity score, top one being the most similar. For pictorial depiction, colors of the nodes indicate the class an entity belongs to. Here, blue: person, red:bike, yellow:table, purple:TV/computer   }
-  \label{fig:C0-Loc-Diagram}
-\end{figure}
 
 \section{Background}
 
@@ -340,23 +341,9 @@ Understanding the image context has been a long standing research objctive. Earl
 
 Entity information in a single image can be used in videos for understanding each frame and identifying other entities in the upcoming frame with more accuracy probablistically. Such information is critical for surveillance purpose and video classification tasks. Early works \cite{semantic-video-surveillance} utilised  moving object information to track and cluster the trajectories throughout the video.  Mid level features with hierarchical behaviour model was further used for event detection and recognition in semantically annotating video \cite{semantic-video-annotation}. Recent works \cite{video-cnn} \cite{video-to-text} use deep neural nets for classifying videos as well as genrating descriptions out of it based on the entities identified during th run time. Our work primary deals with visualising the entity location pattern from frame to frame basis rather than an overall one for the entire video.
 
-Developing semantic graph layer on top of images have been successfully utilised by researchers in past for utilising the extracted attributs from the scene and developing applications on top of it. BabyTalk \cite{babytalk} constructed a CRF graph on top of entities detected in an image and trained their N-gram language model to generate description based on that. 
+Developing semantic graph layer on top of images have been successfully utilised by researchers in past for utilising the extracted attributs from the scene and developing applications on top of it. BabyTalk \cite{babytalk} constructed a CRF graph on top of entities detected in an image and trained their N-gram language model to generate description based on that. On the other hand, Fang and Lorenzo \cite{semantic-image-distance} created a semantic graph from labeled dataset where the nodes are the labeled images and the edges connect pictures with related labels. This graph was then used for content based image retreival by embedding the query image in the graph and retreiving other images nodes in proximity. Some methods  \cite{semantic-image-tag}  \cite{semantic-graph} aimed at combining both the low/mid level features of the images with that of the text based tags provided by the users. A semantic graph was made by the joint function of above features and was looked up for similar images when provided with a query image. Since it's hard to pre-determine all possible set of input query and it's corresponding classes, weak image ranking schemes \cite{weak-image-rank} have also been researched upon. Such weak features are a collection of mid-level representations, which cancomprise of automatic classifier scores derived through unsupervised learning. Weak attributes are applied to such image retrieval problems by modeling dependency of attributes in query image on weak attributes under the framework of structural learning. Image ranking has been further studied \cite{multi-attribute-image-rank} at even finer feature details. The work goes as far as utilising sub attributes of single object, such as race, color, hair-style etc. for human faces. Owing to lack of such fine details for all the possible entities, the usage of it still remains limited.
 
-  
- \cite{graph-semantic-hashing}
- \cite{semantic-image-distance} 
- 
- cbir \cite{visual-features}, 
- \cite{multi-attribute-image-rank},
- \cite{label-image-rank} ,
- \cite{weak-image-rank}
- \cite{attribute-anomaly}
- \cite{semantic-image-tag} 
- \cite{semantic-graph} 
- 
- closest \cite{attribute-graph} 
- This work goes in extra fine details of objects
- Literature has been majorly governed by 
+\\The work that most closely aligns with our work was shown by Attrbute-Graph \cite{attribute-graph}. Similar to our model, the work builds upon state of the art object detectors to extract the entities present. To build a semantic graph, the authors delve in embedding details ranging from important objects, appearances, spatial layout and background context. This is further augmented with a global node to classify the entire scene. Often for real time problems, computation resources are limited and performing computation on features which don't contribute majorly towards output should be minimized. We see our work as between the models that provide classification for entire image and the ones that go into complete details of every sub attribute of entities. To make complete use of distributed systems and reduce computation time  \cite{map-reduce-image}, our proposed method is designed such that it can be scaled under the map-reduce framework and scale gracefully.
 
 \section{Methods}
 Our proposed system can be broadly divided in 5 parts: 
@@ -367,11 +354,12 @@ Our proposed system can be broadly divided in 5 parts:
             \item Building the cached database for CBIR or Pattern based video stream analysis, depending on the use case. 
             \item Visualing the results in an intuitive and user-friendly way
     \end{enumerate}
+
     
     \subsection{The Entity Tagger}
         This section is completely independent of the pipeline and can be replaced with any state of the art object detection technique to keep the final results of the application updated. For the current system we have used the YOLO detector because of it's speed and unified detection and localisation abilities. \\ \\
-        The network design of it's framework is inspired by the GoogLeNet model for image classification. It is first pre-trained on the ImageNet and then the entire model with additional four convolutional layers on top is fine tuned by training it on the PASCAL VOC 2012 \cite{pascal-voc-2012} dataset which consists of 20 entity categories. It divides the entire image in S*S grid and predicts B bounding boxes for each section. Each bounding box contains 5 items: x,y, width, height and IoU conficence. The centre co-ordinates(x,y) are normalised in the range of 0-1 relative to the corresponding section, whereas the width and height are normalised in the range of 0-1 relative to the width and height of the input image. It also predicts the class probablities for C classes in each section. This enables it to predict the classes of the objects and their respective locations in the image simultaneously.
-        \cite{yolo} shows the entire architecture of the Neural Network used by YOLO.
+        The network design of it's framework is inspired by the GoogLeNet model for image classification. It is first pre-trained on the ImageNet\cite{imagenet} and then the entire model with additional four convolutional layers on top is fine tuned by training it on the PASCAL VOC 2012 \cite{pascal-voc-2012} dataset which consists of 20 entity categories. It divides the entire image in S*S grid and predicts B bounding boxes for each section. Each bounding box contains 5 items: x,y, width, height and IoU conficence. The centre co-ordinates(x,y) are normalised in the range of 0-1 relative to the corresponding section, whereas the width and height are normalised in the range of 0-1 relative to the width and height of the input image. It also predicts the class probablities for C classes in each section. This enables it to predict the classes of the objects and their respective locations in the image simultaneously. The figure
+        \ref{fig:YOLO} shows the entire architecture of the Neural Network used by YOLO.
         The final tensor output of the network is of size: 
         \begin{equation}
             S * S * ( B * 5 + C )
@@ -404,12 +392,13 @@ Our proposed system can be broadly divided in 5 parts:
 
     \subsection{Extracting co-location graph}
         
-    All the entities in the image are represented as individual nodes on the graph with a unique identity tag. They all share an weighted edge with each other such that value of the edge represent the perceived distance between the entities. It needs to be noted here that since 2 dimensional images themselves have no information about depth, it is practically not possible to accurately identify the actual distance. We use a crude approximation that works well for general images but is susceptible to wrong measurement in case of images that have optical illusion. We pre-assign a relative size value to each entity which our classifier can detect, assuming they all are at the same depth, then we use the following model to estimate the distnce: <Insert equation>. The graphs can then be exported to common formats to maintian cross-compatibility and to have a richer visualisation through other popular frameworks such as : \ref{other graph visualisation tools}
+    All the entities in the image are represented as individual nodes on the graph with a unique identity tag. They all share an weighted edge with each other such that value of the edge represent the perceived distance between the entities. It needs to be noted here that since 2 dimensional images themselves have no information about depth, it is practically not possible to accurately identify the actual distance. We use a crude approximation that works well for general images but is susceptible to wrong measurement in case of images that have optical illusion. We pre-assign a relative size value to each entity which our classifier can detect, assuming they all are at the same depth, then we use the following model to estimate the distnce: <Insert equation>. The graphs can then be exported to common formats to maintian cross-compatibility and to have a richer visualisation through other popular frameworks such as Gephi \cite{gephi}.
     
     \subsection{Scoring Function}
     We find the similarity in the abstarcted graphs using the following two part scoring function:     
         \begin{equation}
         FinalScore = \beta * CountDiff + (1 - \beta)*LocDiff
+        \label{score}
         \end{equation}
         Here, $\beta \in (0,1)$. The final score is weighted sum of both the scores descrbed below. The parameters $\beta$ help in contolling how much of Entity count similarity should be valued relative to the location differnece score.
         \subsubsection{Entity count score}
@@ -434,7 +423,7 @@ Our proposed system can be broadly divided in 5 parts:
     Since the weights are only crude estimations of the visual distance between the entities, we use the logarithm function to reduce the effect of difference on the score.
     
     \subsection{Building cached database for CBIR}
-    To facilitate efficient scalability, we use a model similar to the inverse word mapping \cite{map-reduce-inverted-index} \cite{map-reduce-image} that can exploit the power of map reduce on distributed systems. In our model, we use the entity as the key and the values are the corresponding images in which they occur. After a final reduction we get a table which can be quickly looked up to retrieve the images containing the required entity(ies). The set of all the mathced images are then scored according to function \cite{score}. 
+    To facilitate efficient scalability, we use a model similar to the inverse word mapping \cite{map-reduce-inverted-index} \cite{map-reduce-image} that can exploit the power of map reduce on distributed systems. In our model, we use the entity as the key and the values are the corresponding images in which they occur. After a final reduction we get a table which can be quickly looked up to retrieve the images containing the required entity(ies). The set of all the mathced images are then scored according to above mentioned function \ref{score}. 
 
     \subsection{Video stream analysis}
     This can be used for active search of co-occurence pattern from any video stream. Since it works directly on all the incoming image frames from the video stream, no database is directly involved. Given a query of co-locaton pattern or an image, the system notifies the user automaticaly when similar pattern is encountered in the video. It has vast potential to be deployed in surveillance cameras to automatically raise an alert if a crowd gathers unexpectedly or any peculiar pattern occurs which in anomalous to the area under surveillance. The same scoring function can be used for this task as well.
