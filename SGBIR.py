@@ -181,7 +181,10 @@ class CBIR(QMainWindow, Ui_MainWindow):
         if not found:   self.cached_db = self.make_db(self.database_path)
 
         
-    def count_diff(self, v1, v2):       
+    def count_diff(self, v1, v2):      
+        #alpha acts as a hyper-parameter that penalizes count differneces of 
+        #classes present only in one as compared to count differneces for classes
+        #present in both.
         w = [self.alpha if i==0 else 1 for i in v1 ]
         return  np.sum(self.mask*w*np.power((v1 - v2), 2)) #sum of weighted Squared error, masked by selected classes        
     
