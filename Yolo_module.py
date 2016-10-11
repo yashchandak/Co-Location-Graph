@@ -333,6 +333,7 @@ class YOLO_TF:
             ftxt.close()
          
         self.tagged_image = img_cp
+        self.tagged_image_original = img_cp.copy()
         cv2.cvtColor(img_cp, cv2.COLOR_BGR2RGB, self.tagged_image) #convert the image to RGB format for QT display
 
     def iou(self,box1,box2):

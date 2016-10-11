@@ -188,14 +188,23 @@ class CBIR(QMainWindow, Ui_MainWindow):
         w = [self.alpha if i==0 else 1 for i in v1 ]
         return  np.sum(self.mask*w*np.power((v1 - v2), 2)) #sum of weighted Squared error, masked by selected classes        
     
-    def loc_diff(self, w1, w2):
-        #more the difference, the less the score
-        return 1
+    def loc_diff(self, query_edges, db_edges):
+        
+        total = 0
+        for e1 in query_edges:
+            best = 99999
+            for e2 in db_edges:
+                if e1[0] == e2[0]: 
+                    diff =abs(e1[1]-e2[1])
+                    best = diff if diff<best else best
+            
+            total += best
         #TODO: add the details
-        return 1/np.exp(np.abs(w1-w2))
+        return np.log(total)
         
     def score(self, edges, vec, db_img):
         #weighted score of location deifference and count difference
+        #higher the score, higher is the difference, lesser the similarity
         return self.beta*self.count_diff(vec, self.cached_db['vec'][db_img]) \
                 + (1-self.beta)*self.loc_diff(edges, self.cached_db['edges'][db_img])        
         
@@ -257,10 +266,10 @@ class CBIR(QMainWindow, Ui_MainWindow):
         imgs = set([img for c in classes_present for img in self.cached_db['inv_map'][c]]) 
 
         #choose the topK similar images from the images retrieved from database
-        best_matches = nsmallest(self.topk, imgs, key = lambda e: self.score(edges, vec, e))
-           
+        best_matches = nsmallest(self.topk, imgs, key = lambda e: self.score(edges, vec, e))  
+        
         self.show_similar(best_matches, self.cached_db['dir'])
-
+        return best_matches[:5]
         
     def tag_image(self, filename = None, batch = False, image = None ):
         #importing TensorFlow on top causes segmentation fault (official bug #2034)
@@ -312,13 +321,19 @@ class CBIR(QMainWindow, Ui_MainWindow):
         self.tableWidget.clearContents()
         self.update_categories() #update categories to incorporate any changes made
         
-        #Change the file path to any default directory, as per need.             
+        #Change the file path to any default directory, as per need. 
         filename = QFileDialog.getOpenFileName(directory = '/home/yash/Project/dataset/Pascal VOC 2012/')
         self.lineEdit.setText(filename)
         
         if filename.split('.')[1] in self.valid_images:
             self.disp_img(filename = filename) 
-            self.find_similar(self.classifier.result)
+            self.file_tag= '/home/yash/Project/dataset/Pascal VOC 2012/report/'+ (filename.split('/')[-1]).split('.')[0]+"_"
+            best_matches = self.find_similar(self.classifier.result)
+            
+            cv2.imwrite(self.file_tag+'.jpg',cv2.imread(filename,1))
+            cv2.imwrite(self.file_tag+'tagged.jpg',self.classifier.tagged_image_original)
+            for idx,im in enumerate(best_matches):
+                cv2.imwrite(self.file_tag+str(idx)+'.jpg',cv2.imread(self.cached_db['dir']+'/'+im,1))
             #self.find_similar_using_vector(self.classifier.result)
         else:
             print("Invalid file format")
